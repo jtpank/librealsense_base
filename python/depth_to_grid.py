@@ -120,6 +120,13 @@ def test_grid():
     grid = OccupancyGrid(1, 10)  # Create a 10x10 grid with resolution 1
     grid.draw_line(1, 1, 9, 4)
     grid.print_grid()
+    grid.clear_grid()
+    grid.draw_line(1, 1, 9, 3)
+    grid.print_grid()
+    grid.clear_grid()
+    grid.draw_line(9, 3, 0, 9)
+    grid.print_grid()
+    grid.clear_grid()
 if __name__ == "__main__":
     test_grid()
     
