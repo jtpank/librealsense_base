@@ -124,6 +124,7 @@ def test_grid():
     grid.draw_line(1, 1, 9, 3)
     grid.print_grid()
     grid.clear_grid()
+    print("\n ****************************************************** \n")
     grid.draw_line(9, 3, 0, 9)
     grid.print_grid()
     grid.clear_grid()
