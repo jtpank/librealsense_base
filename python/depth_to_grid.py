@@ -3,8 +3,63 @@ import numpy as np
 import cv2
 
 
-if __name__ == "__main__":
-    # Configure depth and color streams
+class OccupancyGrid:
+    def __init__(self, resolution, side_length, default_value=0.5):
+        #initializes a square occupancy grid depending on the side_length and resolution
+        self.__width = side_length // resolution
+        self.__height = side_length // resolution
+        self.__default_value = default_value
+        self.__grid = np.full((self.__width, self.__height), self.__default_value)
+
+    def get_value(self, x, y):
+        return self.__grid[y][x]
+
+    def set_value(self, x, y, value):
+        self.__grid[y][x] = value
+
+    def clear_grid(self, value=0):
+        self.__grid = np.full((self.__width, self.__height), self.__default_value)
+
+    def print_grid(self):
+        for row in self.__grid:
+            print(' '.join(map(str, row)))
+
+    #log odds update algorithm
+    # input row is the data from the camera
+    def update_grid(self, input_row):
+        for cell in self.__grid:
+            if cell in input_row:
+                # log_odds_i = prev_log_odds_i + inv_sensor_model(cell, state, observation) - log_odds_initial
+                pass
+            else:
+                # log_odds_i = prev_log_odds_i
+                pass
+        return
+    
+    #implement Bresenhems line algorithm for 2 points 
+    # pt1 = (x1, y1) is camera origin, pt2 = (x2, y2) is point with non-zero depth reading
+    def draw_line(self, x1, y1, x2, y2):
+        dx = abs(x2 - x1)
+        dy = abs(y2 - y1)
+        sx = 1 if x1 < x2 else -1
+        sy = 1 if y1 < y2 else -1
+        err = dx - dy
+
+        while x1 != x2 or y1 != y2:
+            self.set_value(x1, y1, 1)  # Set the value of the grid cell to 1
+            e2 = 2 * err
+            if e2 > -dy:
+                err -= dy
+                x1 += sx
+            if e2 < dx:
+                err += dx
+                y1 += sy
+
+        self.set_value(x2, y2, 1)  # Set the value of the end point to 1
+
+
+def main():
+# Configure depth and color streams
     pipeline = rs.pipeline()
     config = rs.config()
 
@@ -56,9 +111,15 @@ if __name__ == "__main__":
                 depth_middle_row.append(depth_frame.get_distance(row, col))
 
             depth_middle_row = np.array(depth_middle_row)
-            print("_______________________________________________")
-            print(depth_image_data_dim)
-            print(depth_middle_row)
+
     finally:
         # Stop streaming
         pipeline.stop()
+
+def test_grid():
+    grid = OccupancyGrid(1, 10)  # Create a 10x10 grid with resolution 1
+    grid.draw_line(1, 1, 8, 8)  # Draw a line from (1, 1) to (8, 8)
+    grid.print_grid()
+if __name__ == "__main__":
+    test_grid()
+    
