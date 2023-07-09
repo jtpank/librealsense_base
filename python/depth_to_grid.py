@@ -42,15 +42,11 @@ if __name__ == "__main__":
                 continue
 
             # Convert images to numpy arrays
-            depth_image = np.asanyarray(depth_frame.get_data())
-
-            # Apply colormap on depth image (image must be converted to 8-bit per pixel first)
-            depth_colormap = cv2.applyColorMap(cv2.convertScaleAbs(depth_image, alpha=0.03), cv2.COLORMAP_JET)
-
-            depth_colormap_dim = depth_colormap.shape
+            depth_image_data = np.asanyarray(depth_frame.get_distance())
+            depth_image_data_dim = depth_image_data.shape
             print("_______________________________________________")
-            print(depth_colormap_dim)
-            print(depth_image)
+            print(depth_image_data_dim)
+            print(depth_image_data)
     finally:
         # Stop streaming
         pipeline.stop()
