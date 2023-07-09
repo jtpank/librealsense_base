@@ -46,9 +46,19 @@ if __name__ == "__main__":
             depth_image_data = np.asanyarray(depth_frame.get_data())
             depth_image_data_dim = depth_image_data.shape
 
+            #take the middle row of pixels
+            row = depth_frame.get_height() / 2
+
+            depth_middle_row = []
+            start_col = depth_frame.get_width() / 4
+            end_col = depth_frame.get_width() / 2 + start_col
+            for col in range(start_col, end_col):
+                depth_middle_row.append(depth_frame.get_distance(row, col))
+
+            depth_middle_row = np.array(depth_middle_row)
             print("_______________________________________________")
             print(depth_image_data_dim)
-            print(depth_frame.get_height())
+            print(depth_middle_row)
     finally:
         # Stop streaming
         pipeline.stop()
