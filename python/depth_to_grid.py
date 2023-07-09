@@ -47,11 +47,11 @@ if __name__ == "__main__":
             depth_image_data_dim = depth_image_data.shape
 
             #take the middle row of pixels
-            row = depth_frame.get_height() / 2
+            row = depth_frame.get_height() // 2
 
             depth_middle_row = []
-            start_col = depth_frame.get_width() / 4
-            end_col = depth_frame.get_width() / 2 + start_col
+            start_col = depth_frame.get_width() // 4
+            end_col = depth_frame.get_width() // 2 + start_col
             for col in range(start_col, end_col):
                 depth_middle_row.append(depth_frame.get_distance(row, col))
 
