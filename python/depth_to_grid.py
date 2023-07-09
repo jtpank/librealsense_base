@@ -48,7 +48,7 @@ if __name__ == "__main__":
 
             print("_______________________________________________")
             print(depth_image_data_dim)
-            print(depth_image_data.get_height())
+            print(depth_frame.get_height())
     finally:
         # Stop streaming
         pipeline.stop()
