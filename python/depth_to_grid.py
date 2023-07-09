@@ -4,7 +4,7 @@ import cv2
 
 
 class OccupancyGrid:
-    def __init__(self, resolution, side_length, default_value=0.5):
+    def __init__(self, resolution, side_length, default_value=0):
         #initializes a square occupancy grid depending on the side_length and resolution
         self.__width = side_length // resolution
         self.__height = side_length // resolution
@@ -118,7 +118,7 @@ def main():
 
 def test_grid():
     grid = OccupancyGrid(1, 10)  # Create a 10x10 grid with resolution 1
-    grid.draw_line(1, 1, 8, 8)  # Draw a line from (1, 1) to (8, 8)
+    grid.draw_line(1, 1, 9, 4)
     grid.print_grid()
 if __name__ == "__main__":
     test_grid()
