@@ -41,12 +41,14 @@ if __name__ == "__main__":
             if not depth_frame:
                 continue
 
+            
             # Convert images to numpy arrays
-            depth_image_data = np.asanyarray(depth_frame.get_distance())
+            depth_image_data = np.asanyarray(depth_frame.get_data())
             depth_image_data_dim = depth_image_data.shape
+
             print("_______________________________________________")
             print(depth_image_data_dim)
-            print(depth_image_data)
+            print(depth_image_data.get_height())
     finally:
         # Stop streaming
         pipeline.stop()
