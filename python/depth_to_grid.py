@@ -27,16 +27,35 @@ class OccupancyGrid:
     #log odds update algorithm
     # input row is the data from the camera
     def update_grid(self, input_row):
-        for cell in self.__grid:
-            if cell in input_row:
-                # log_odds_i = prev_log_odds_i + inv_sensor_model(cell, state, observation) - log_odds_initial
-                pass
-            else:
-                # log_odds_i = prev_log_odds_i
-                pass
-        return
+        for cell in input_row:
+            x, y, observation = cell
+            log_odds_initial = np.log(self.__default_value / (1 - self.__default_value))
+            log_odds_i = self.__grid[y][x]
+            log_odds_i += self.inv_sensor_model(x, y, observation) - log_odds_initial
+            self.__grid[y][x] = log_odds_i
+
+        # pseudo-code
+        # for cell in self.__grid:
+        #     if cell in input_row:
+        #         # log_odds_i = prev_log_odds_i + inv_sensor_model(cell, state, observation) - log_odds_initial
+        #         pass
+        #     else:
+        #         # log_odds_i = prev_log_odds_i
+        #         pass
+        # return
     
-    #implement Bresenhems line algorithm for 2 points 
+    # Sensor model to convert an observation to a log-odds update
+    def inv_sensor_model(self, x, y, observation):
+        # Define your sensor model logic here
+        # It should return the log-odds update based on the observation
+        # For simplicity, let's assume a binary sensor that sets occupied cells to 1 and unoccupied cells to -1
+        if observation == 1:
+            return np.log(0.9 / 0.1)
+        else:
+            return np.log(0.1 / 0.9)
+        
+
+    #Bresenhems line algorithm for 2 points 
     # pt1 = (x1, y1) is camera origin, pt2 = (x2, y2) is point with non-zero depth reading
     def draw_line(self, x1, y1, x2, y2):
         dx = abs(x2 - x1)
