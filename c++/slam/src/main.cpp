@@ -48,7 +48,7 @@ int main(int argc, char * argv[]) try
     rs2::pipeline pipe;
 
     // Create a configuration for configuring the pipeline with a non default profile
-    rs2::config cfg;=
+    rs2::config cfg;
     // Add streams of gyro and accelerometer to configuration
     cfg.enable_stream(RS2_STREAM_ACCEL, RS2_FORMAT_MOTION_XYZ32F);
     cfg.enable_stream(RS2_STREAM_GYRO, RS2_FORMAT_MOTION_XYZ32F);
@@ -57,9 +57,9 @@ int main(int argc, char * argv[]) try
 
     
     const auto window_name = "Display Image";
-    cv::namedWindow(window_name, WINDOW_AUTOSIZE);
+    cv::namedWindow(window_name, cv::WINDOW_AUTOSIZE);
 
-    while (cv::waitKey(1) < 0 && cv::getWindowProperty(window_name, WND_PROP_AUTOSIZE) >= 0)
+    while (cv::waitKey(1) < 0 && cv::getWindowProperty(window_name, cv::WND_PROP_AUTOSIZE) >= 0)
     {
         rs2::frameset data = pipe.wait_for_frames(); // Wait for next set of frames from the camera
         rs2::frame depth = data.get_depth_frame().apply_filter(color_map);
