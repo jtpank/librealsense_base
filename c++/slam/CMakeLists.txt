@@ -1,4 +1,4 @@
-cmake_minimum_requirements(VERSION 3.3)
+cmake_minimum_required(VERSION 3.3)
 set(CMAKE_CXX_STANDARD 17)
 project(slam)
 
@@ -10,4 +10,4 @@ if(${CMAKE_SYSTEM_PROCESSOR} STREQUAL "aarch64")
 endif()
 
 target_link_libraries(slam PUBLIC opengl)
-target_include_directories(slam PUBLIC include)543 
+target_include_directories(slam PUBLIC include)
