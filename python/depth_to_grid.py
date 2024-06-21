@@ -4,7 +4,7 @@ import cv2
 
 
 class OccupancyGrid:
-    def __init__(self, resolution, side_length, default_value=0):
+    def __init__(self, resolution, side_length, default_value=0.5):
         #initializes a square occupancy grid depending on the side_length and resolution
         self.__width = side_length // resolution
         self.__height = side_length // resolution
@@ -51,8 +51,7 @@ class OccupancyGrid:
         # For simplicity, let's assume a binary sensor that sets occupied cells to 1 and unoccupied cells to -1
         if observation == 1:
             return np.log(0.9 / 0.1)
-        else:
-            return np.log(0.1 / 0.9)
+        return np.log(0.1 / 0.9)
         
 
     #Bresenhems line algorithm for 2 points 
@@ -149,5 +148,5 @@ def test_grid():
     grid.print_grid()
     grid.clear_grid()
 if __name__ == "__main__":
-    test_grid()
+    main()
     
