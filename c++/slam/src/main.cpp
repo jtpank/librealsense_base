@@ -1,10 +1,5 @@
-<<<<<<< HEAD
 // License: Apache 2.0. See LICENSE file in root directory.
 // Copyright(c) 2017 Intel Corporation. All Rights Reserved.
-=======
-#include <librealsense2/rs.hpp>
-#include <iostream>
->>>>>>> b5cebd3478c6eb6c0d6f6a62d7ab1b2534b821ab
 
 #include <librealsense2/rs.hpp> // Include RealSense Cross Platform API
 #include <opencv2/opencv.hpp>   // Include OpenCV API
