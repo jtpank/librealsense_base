@@ -15,13 +15,17 @@ if(${CMAKE_SYSTEM_PROCESSOR} STREQUAL "x86_64")
 endif()
 
 #OpenGL
-find_package(OpenGL REQUIRED)
+#find_package(OpenGL REQUIRED)
+
 #GLUT
-find_package(GLUT REQUIRED)
+#find_package(GLUT REQUIRED)
+
+#RealSense2
+find_package(realsense2 REQUIRED)
 
 add_executable(slam ${PROJECT_SOURCE_DIR}/src/main.cpp)
 
 # Link stage
-target_link_libraries(slam ${OPENGL_LIBRARIES} ${GLUT_LIBRARIES} )
+target_link_libraries(slam ${OPENGL_LIBRARIES} ${GLUT_LIBRARIES} realsense2)
 # target_link_libraries(slam PUBLIC opengl)
 # target_include_directories(slam PUBLIC include)

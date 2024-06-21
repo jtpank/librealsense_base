@@ -1,29 +1,10 @@
+#include <librealsense2/rs.hpp>
 #include <iostream>
-
-#include <GL/glut.h>
-
-void displayMe(void)
-{
-    glClear(GL_COLOR_BUFFER_BIT);
-    glBegin(GL_POLYGON);
-        glVertex3f(0.5, 0.0, 0.5);
-        glVertex3f(0.5, 0.0, 0.0);
-        glVertex3f(0.0, 0.5, 0.0);
-        glVertex3f(0.0, 0.0, 0.5);
-    glEnd();
-    glFlush();
-}
-
 
 int main(int argc, char** argv)
 {
-    std::cout << "running..." << std::endl;
-    glutInit(&argc, argv);
-    glutInitDisplayMode(GLUT_SINGLE);
-    glutInitWindowSize(400, 300);
-    glutInitWindowPosition(100, 100);
-    glutCreateWindow("Hello world!");
-    glutDisplayFunc(displayMe);
-    glutMainLoop();
+    // Create a Pipeline - this serves as a top-level API for streaming and processing frames
+    rs2::pipeline p;
+    std::cout << "running and found rs lib!" << std::endl;
     return 0;
 }
