@@ -9,5 +9,5 @@ if(${CMAKE_SYSTEM_PROCESSOR} STREQUAL "aarch64")
     # do stuff
 endif()
 
-target_link_libraries(slam PUBLIC opengl)
+# target_link_libraries(slam PUBLIC opengl)
 target_include_directories(slam PUBLIC include)
