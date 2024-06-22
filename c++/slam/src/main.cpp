@@ -82,7 +82,7 @@ int main(int argc, char * argv[]) try
 
         // Apply Histogram Equalization
         cv::equalizeHist( ir, ir );
-        cv::applyColorMap(ir, ir, COLORMAP_JET);
+        cv::applyColorMap(ir, ir, cv::COLORMAP_JET);
 
         // check if both frames are valid
         if (!color_frame || !aligned_depth_frame) {
