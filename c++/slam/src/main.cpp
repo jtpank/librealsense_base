@@ -47,8 +47,10 @@ int main(int argc, char * argv[]) try
 
     // Add streams of gyro and accelerometer to configuration
     cfg.enable_stream(RS2_STREAM_COLOR, 640, 480, RS2_FORMAT_BGR8, 30);
-    cfg.enable_stream(RS2_STREAM_ACCEL, RS2_FORMAT_MOTION_XYZ32F);
-    cfg.enable_stream(RS2_STREAM_GYRO, RS2_FORMAT_MOTION_XYZ32F);
+    cfg.enable_stream(RS2_STREAM_INFRARED, 640, 480, RS2_FORMAT_Y8, 30);
+    cfg.enable_stream(RS2_STREAM_DEPTH, 640, 480, RS2_FORMAT_Z16, 30);
+    // cfg.enable_stream(RS2_STREAM_ACCEL, RS2_FORMAT_MOTION_XYZ32F);
+    // cfg.enable_stream(RS2_STREAM_GYRO, RS2_FORMAT_MOTION_XYZ32F);
 
     // Start streaming with default recommended configuration
      rs2::pipeline_profile profile = pipe.start();
@@ -72,6 +74,16 @@ int main(int argc, char * argv[]) try
         rs2::frame color_frame = aligned_frames.get_color_frame();
         rs2::depth_frame aligned_depth_frame = aligned_frames.get_depth_frame();
 
+        rs2::frame ir_frame = aligned_frames.first(RS2_STREAM_INFRARED);
+        rs2::frame depth_frame = frames.get_depth_frame();
+
+        // Creating OpenCV matrix from IR image
+        cv::Mat ir(cv::Size(640, 480), CV_8UC1, (void*)ir_frame.get_data(), cv::Mat::AUTO_STEP);
+
+        // Apply Histogram Equalization
+        cv::equalizeHist( ir, ir );
+        cv::applyColorMap(ir, ir, COLORMAP_JET);
+
         // check if both frames are valid
         if (!color_frame || !aligned_depth_frame) {
             continue;
@@ -86,7 +98,7 @@ int main(int argc, char * argv[]) try
 
         // Concatenate color and depth frames horizontally
         cv::Mat both_images;
-        cv::hconcat(color_image, depth_colormap, both_images);
+        cv::hconcat(ir, depth_colormap, both_images);
 
         cv::imshow(window_name, both_images);
     }
