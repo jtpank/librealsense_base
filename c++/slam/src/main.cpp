@@ -43,7 +43,8 @@ int main(int argc, char * argv[]) try
 
     // Declare depth colorizer for pretty visualization of depth data
     rs2::colorizer color_map;
-
+    //alignment
+    rs2::align align_to(RS2_STREAM_COLOR);
     // Declare RealSense pipeline, encapsulating the actual device and sensors
     rs2::pipeline pipe;
 
@@ -54,7 +55,7 @@ int main(int argc, char * argv[]) try
     cfg.enable_stream(RS2_STREAM_GYRO, RS2_FORMAT_MOTION_XYZ32F);
     // Start streaming with default recommended configuration
     pipe.start();
-
+    
     
     const auto window_name = "Display Image";
     cv::namedWindow(window_name, cv::WINDOW_AUTOSIZE);
@@ -94,15 +95,13 @@ int main(int argc, char * argv[]) try
         cv::applyColorMap(depth_colormap, depth_colormap, cv::COLORMAP_JET);
 
         // Wrap good features (assuming fpr.wrap_goodFeats is a custom function)
-        cv::Mat colorFrame, depthFrame;
-        fpr.wrap_goodFeats(color_image, depth_colormap, depth_image, colorFrame, depthFrame);
+        // cv::Mat colorFrame, depthFrame;
+        // fpr.wrap_goodFeats(color_image, depth_colormap, depth_image, colorFrame, depthFrame);
 
         // Concatenate color and depth frames horizontally
         cv::Mat both_images;
-        cv::hconcat(colorFrame, depthFrame, both_images);
+        cv::hconcat(color_image, depth_colormap, both_images);
 
-        // Display the concatenated image
-        cv::namedWindow("test show vid", cv::WINDOW_AUTOSIZE);
         cv::imshow("test show vid", both_images);
     }
 
