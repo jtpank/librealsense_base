@@ -1,6 +1,6 @@
 // include OpenCV header file
 #include <opencv2/opencv.hpp>
-
+#include <librealsense2/rs.hpp> // Include RealSense Cross Platform API
 using namespace std;
 using namespace cv;
 
