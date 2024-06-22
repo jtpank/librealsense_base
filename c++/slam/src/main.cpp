@@ -53,8 +53,22 @@ int main(int argc, char * argv[]) try
     // Add streams of gyro and accelerometer to configuration
     cfg.enable_stream(RS2_STREAM_ACCEL, RS2_FORMAT_MOTION_XYZ32F);
     cfg.enable_stream(RS2_STREAM_GYRO, RS2_FORMAT_MOTION_XYZ32F);
+
     // Start streaming with default recommended configuration
-    pipe.start();
+     rs2::pipeline_profile profile = pipe.start();
+
+         // Get the color sensor
+    auto sensor = profile.get_device().first<rs2::color_sensor>();
+
+    // Disable Auto White Balance
+    if (sensor.supports(RS2_OPTION_ENABLE_AUTO_WHITE_BALANCE)) {
+        sensor.set_option(RS2_OPTION_ENABLE_AUTO_WHITE_BALANCE, 0);
+    }
+
+    // Set Manual White Balance to 4800K
+    if (sensor.supports(RS2_OPTION_WHITE_BALANCE)) {
+        sensor.set_option(RS2_OPTION_WHITE_BALANCE, 4800);
+    }
     
     
     const auto window_name = "Display Image";
