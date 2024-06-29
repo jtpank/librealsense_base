@@ -10,7 +10,7 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${PROJECT_SOURCE_DIR}/bin")
 #RealSense2
 find_package(realsense2 REQUIRED)
 
-add_executable(slam ${PROJECT_SOURCE_DIR}/src/main.cpp)
+add_executable(slam ${PROJECT_SOURCE_DIR}/src/ir.cpp)
 
 if(${CMAKE_SYSTEM_PROCESSOR} STREQUAL "aarch64")
     message("building for aarch64")
