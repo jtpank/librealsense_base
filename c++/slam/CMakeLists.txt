@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.3)
 set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED TRUE)
 project(slam)
-set(ENTRY_FILE "ir.cpp")
+set(ENTRY_FILE "main.cpp")
 
 file(MAKE_DIRECTORY ${PROJECT_SOURCE_DIR}/bin)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${PROJECT_SOURCE_DIR}/bin")
