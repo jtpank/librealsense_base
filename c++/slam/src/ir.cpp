@@ -22,7 +22,7 @@ class FrameProcessor
             cv::namedWindow(goodFeatsWindow, cv::WINDOW_AUTOSIZE);
 
             cv::Mat workFrame, grayFrame;
-            vector<cv::Point2f> corners;
+            std::vector<cv::Point2f> corners;
             inputFrame.copyTo(workFrame);
             cv::cvtColor(workFrame, grayFrame, COLOR_BGR2GRAY);
 
@@ -33,8 +33,15 @@ class FrameProcessor
             cv::goodFeaturesToTrack(grayFrame, corners, max_count, quality_level, min_distance);
             std::cout << "Corners length: " << corners.size() << std::endl;
 
-            int radius = 2;
+            std::vector<cv::KeyPoint> kps1;
+            this->pOrb->detect(inputFrame, kps1);
+            
+            // cv::Mat des1;
+            // this->pOrb->compute(inputFrame, kps1, des1);
+            std::cout << "Keypoints Size: " << kps1.size() << std::endl;
 
+            //Drawing the features
+            int radius = 2;
             for(auto &corner : corners)
             {
                 cv::circle(workFrame, corner, radius, cv::Scalar(0, 255, 0));
