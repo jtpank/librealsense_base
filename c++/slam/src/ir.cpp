@@ -1,11 +1,34 @@
 // include OpenCV header file
 #include <opencv2/opencv.hpp>
+#include <opencv2/features2d.hpp>
 #include <librealsense2/rs.hpp> // Include RealSense Cross Platform API
+#include <memory>
 using namespace std;
 using namespace cv;
 
+class FrameProcessor
+{
+    private:
+        cv::Ptr<cv::ORB> pOrb;
+        float depthScale;
+    public:
+        FrameProcessor() {
+            std::cout << "Constructing frame processor object." << std::endl;
+            pOrb = cv::ORB::create(nfeatures=500, scaleFactor=1.2f, 
+            nlevels=8, edgeThreshold=31, firstLevel=0, WTA_K = 2,
+            scoreType = ORB::HARRIS_SCORE, patchSize = 31, fastThreshold = 20)
+        };
+        void wrapGoodFeatures() {
+            return;
+        };
+
+};
+
+
 int main()
 {
+    std::unique_ptr<FrameProcessor> fp_ptr = std::make_unique<FrameProcessor>();
+
     //Contruct a pipeline which abstracts the device
     rs2::pipeline pipe;
 
