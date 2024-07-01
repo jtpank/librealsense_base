@@ -14,9 +14,7 @@ class FrameProcessor
     public:
         FrameProcessor() {
             std::cout << "Constructing frame processor object." << std::endl;
-            pOrb = cv::ORB::create(nfeatures=500, scaleFactor=1.2f, 
-            nlevels=8, edgeThreshold=31, firstLevel=0, WTA_K = 2,
-            scoreType = ORB::HARRIS_SCORE, patchSize = 31, fastThreshold = 20)
+            pOrb = cv::ORB::create(); 
         };
         void wrapGoodFeatures() {
             return;
