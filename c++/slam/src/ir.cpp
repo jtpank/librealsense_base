@@ -32,13 +32,16 @@ class FrameProcessor
             double min_distance = 3;
             cv::goodFeaturesToTrack(grayFrame, corners, max_count, quality_level, min_distance);
             std::cout << "Corners length: " << corners.size() << std::endl;
-            // for(auto &corner : corners)
-            // {
-                
-            // }
+
+            int radius = 2;
+
+            for(auto &corner : corners)
+            {
+                cv::circle(workFrame, corner, radius, cv::Scalar(0, 255, 0));
+            }
             while(cv::waitKey(1))
             {
-                cv::imshow(goodFeatsWindow, inputFrame);
+                cv::imshow(goodFeatsWindow, workFrame);
             }
 
             return;
