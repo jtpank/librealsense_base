@@ -34,7 +34,12 @@ class FrameProcessor
             std::cout << "Corners length: " << corners.size() << std::endl;
 
             std::vector<cv::KeyPoint> kps1;
-            this->pOrb->detect(inputFrame, kps1);
+            cv::Mat des1;
+            for(auto &corner : corners)
+            {
+                kps1.emplace_back(cv::Keypoint(corner, 1.f));
+            }
+            this->pOrb->compute(inputFrame, kps1, des1);
             
             // cv::Mat des1;
             // this->pOrb->compute(inputFrame, kps1, des1);
