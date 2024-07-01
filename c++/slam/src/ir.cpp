@@ -22,7 +22,7 @@ class FrameProcessor
             cv::namedWindow(goodFeatsWindow, cv::WINDOW_AUTOSIZE);
 
             cv::Mat workFrame, grayFrame;
-            vector<cv::Point2f> corners[1];
+            vector<cv::Point2f> corners[2];
             inputFrame.copyTo(workFrame);
             cv::cvtColor(workFrame, grayFrame, COLOR_BGR2GRAY);
 
@@ -30,7 +30,7 @@ class FrameProcessor
             int max_count = 100; 
             double quality_level = 0.01; 
             double min_distance = 3;
-            cv::goodFeaturesToTrack(grayFrame, corners[0], max_count, quality_level, min_distance);
+            cv::goodFeaturesToTrack(grayFrame, corners[1], max_count, quality_level, min_distance);
             std::cout << "Corners length: " << corners.size() << std::endl;
             // for(auto &corner : corners)
             // {
