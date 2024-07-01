@@ -22,7 +22,7 @@ class FrameProcessor
             cv::namedWindow(goodFeatsWindow, cv::WINDOW_AUTOSIZE);
 
             cv::Mat workFrame, grayFrame;
-            vector<Point2f> corners[1];
+            vector<cv::Point2f> corners[1];
             inputFrame.copyTo(workFrame);
             cv::cvtColor(workFrame, grayFrame, COLOR_BGR2GRAY);
 
@@ -38,7 +38,7 @@ class FrameProcessor
             // }
             while(cv::waitKey(1))
             {
-                cv::imshow(goodFeatsWindow, frame);
+                cv::imshow(goodFeatsWindow, inputFrame);
             }
 
             return;
