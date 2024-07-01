@@ -37,7 +37,7 @@ class FrameProcessor
             cv::Mat des1;
             for(auto &corner : corners)
             {
-                kps1.emplace_back(cv::Keypoint(corner, 1.f));
+                kps1.emplace_back(cv::KeyPoint(corner, 1.f));
             }
             this->pOrb->compute(inputFrame, kps1, des1);
             
