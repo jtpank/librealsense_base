@@ -67,12 +67,12 @@ int main()
                 continue;
             }
             // Creating OpenCV matrix from IR image
-            cv::Mat ir(Size(640, 480), cv::CV_8UC1, (void*)depth_frame.get_data(), cv::Mat::AUTO_STEP);
+            cv::Mat depth_img(cv::Size(640, 480), cv::CV_8UC1, (void*)depth_frame.get_data(), cv::Mat::AUTO_STEP);
 
             // Apply Histogram Equalization
             // equalizeHist( ir, ir );
-            cv::applyColorMap(depth_frame, depth_frame, cv::COLORMAP_JET);
-            cv::imshow(window_name, depth_frame);
+            cv::applyColorMap(depth_img, depth_img, cv:COLORMAP_JET);
+            cv::imshow(window_name, depth_img);
         }
     }
     return 0;
