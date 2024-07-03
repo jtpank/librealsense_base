@@ -65,7 +65,7 @@ int main()
                 continue;
             }
             //From: https://github.com/GruffyPuffy/imutest/blob/master/imutest.cpp
-            for (auto f : aligned_frames)
+            for (auto f : frames)
             {
                 rs2::stream_profile profile = f.get_profile();
 
@@ -78,11 +78,11 @@ int main()
             }
             
             //Get the frames
-            rs2::frame color_frame = aligned_frames.get_color_frame();
-            rs2::depth_frame aligned_depth_frame = aligned_frames.get_depth_frame();
-            rs2::frame accel_frame = aligned_frames.first(RS2_STREAM_ACCEL, RS2_FORMAT_MOTION_XYZ32F);
+            rs2::frame color_frame = frames.get_color_frame();
+            rs2::depth_frame aligned_depth_frame = frames.get_depth_frame();
+            rs2::frame accel_frame = frames.first(RS2_STREAM_ACCEL, RS2_FORMAT_MOTION_XYZ32F);
             rs2::motion_frame accel = accel_frame.as<rs2::motion_frame>();
-            rs2::frame gyro_frame = aligned_frames.first(RS2_STREAM_GYRO, RS2_FORMAT_MOTION_XYZ32F);
+            rs2::frame gyro_frame = frames.first(RS2_STREAM_GYRO, RS2_FORMAT_MOTION_XYZ32F);
             rs2::motion_frame gyro = gyro_frame.as<rs2::motion_frame>();
             //helper function: auto depth_mat = depth_frame_to_meters(pipe, depth_frame);
             // printf("frames length: %li, aligned_frames length: %li\n", frames.size(), aligned_frames.size());
