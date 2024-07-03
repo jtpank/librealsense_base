@@ -48,8 +48,7 @@ int main()
         //Instruct pipeline to start streaming with the requested configuration
         rs2::pipeline_profile pipeline_profile = pipe.start(cfg);
         
-        rs2_stream align_to = find_stream_to_align(pipeline_profile.get_streams());
-        rs2::align align(align_to);
+        rs2::align align(RS2_STREAM_COLOR);
         //Display time
         const auto window_name = "Display Image";
         cv::namedWindow(window_name, cv::WINDOW_AUTOSIZE);
@@ -79,7 +78,7 @@ int main()
             }
             
             //Get the frames
-            rs2::frame color_frame = aligned_frames.first_or_default(align_to);
+            rs2::frame color_frame = aligned_frames.first_or_default(RS2_STREAM_COLOR);
             rs2::depth_frame aligned_depth_frame = aligned_frames.get_depth_frame();
             rs2::frame accel_frame = aligned_frames.first(RS2_STREAM_ACCEL, RS2_FORMAT_MOTION_XYZ32F);
             rs2::motion_frame accel = accel_frame.as<rs2::motion_frame>();
