@@ -56,16 +56,16 @@ int main()
         while (cv::waitKey(1) < 0 && cv::getWindowProperty(window_name, cv::WND_PROP_AUTOSIZE) >= 0)
         {
             // Camera warmup - dropping several first frames to let auto-exposure stabilize
-            rs2::frameset frames;
+            rs2::frameset frames, aligned_frames;
             try {
                 frames = pipe.wait_for_frames();
+                aligned_frames = align_to.process(frames);
             } catch (const rs2::error & e) {
                 std::cerr << "RealSense error calling " << e.get_failed_function() << "(" << e.get_failed_args() << "):\n" << e.what() << std::endl;
                 continue;
             }
-            rs2::frameset aligned_frames = align_to.process(frames);
             //From: https://github.com/GruffyPuffy/imutest/blob/master/imutest.cpp
-            for (auto f : frames)
+            for (auto f : aligned_frames)
             {
                 rs2::stream_profile profile = f.get_profile();
 
