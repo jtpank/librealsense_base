@@ -94,7 +94,7 @@ int main()
 
             if (accel)
             {
-                rs2::rs2_vector av = accel.get_motion_data();
+                rs2_vector av = accel.get_motion_data();
                 float R = sqrtf(av.x * av.x + av.y * av.y + av.z * av.z);
                 float newRoll = acos(av.x / R);
                 float newYaw = acos(av.y / R);
@@ -103,7 +103,7 @@ int main()
             }
             if (gyro)
             {
-                rs2::rs2_vector gv = gyro.get_motion_data();
+                rs2_vector gv = gyro.get_motion_data();
                 float gvx   = gv.x;
                 float gvy    = gv.y;
                 float gvz  = gv.z;
