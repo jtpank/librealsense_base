@@ -66,7 +66,7 @@ int main()
 
             printf("frames length: %li, aligned_frames length: %li\n", frames.size(), aligned_frames.size());
 
-            if (!aligned_depth_frame  || !color_fram) 
+            if (!aligned_depth_frame  || !color_frame) 
             {
                 continue;
             }
