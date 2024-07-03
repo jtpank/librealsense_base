@@ -19,7 +19,7 @@ void FrameProcessor::wrapGoodFeatures(cv::Mat &inputFrame, cv::Mat &depthFrame, 
     cv::Mat grayFrame;
     std::vector<cv::Point2f> corners;
     inputFrame.copyTo(outputFrame);
-    cv::cvtColor(outputFrame, grayFrame, COLOR_BGR2GRAY);
+    cv::cvtColor(outputFrame, grayFrame, cv::COLOR_BGR2GRAY);
 
     //Parameters should move elswhere
     int max_count = 100; 
@@ -52,7 +52,7 @@ void FrameProcessor::wrapGoodFeatures(cv::Mat &inputFrame, cv::Mat &depthFrame, 
 void FrameProcessor::test_wrapGoodFeatures()
 {   
     //TODO: this returns a cv::Exception if not called from the directory with the image
-    cv::Mat inputFrame = cv::imread("./test-image.png", IMREAD_COLOR);
+    cv::Mat inputFrame = cv::imread("./test-image.png", cv::IMREAD_COLOR);
     cv::Mat depthFrame, outputFrame;
 
     wrapGoodFeatures(inputFrame, depthFrame, outputFrame);

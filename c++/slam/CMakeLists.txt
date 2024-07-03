@@ -16,8 +16,8 @@ if(${CMAKE_SYSTEM_PROCESSOR} STREQUAL "aarch64")
     find_package( OpenCV 4.0.0 REQUIRED )
     #RealSense2
     find_package(realsense2 REQUIRED)
-    target_include_directories(slam ${OpenCV_INCLUDE_DIRS})
-    target_include_directories(slam ${INCLUDE_DIRS})
+    target_include_directories(slam PRIVATE ${OpenCV_INCLUDE_DIRS})
+    target_include_directories(slam PRIVATE ${INCLUDE_DIRS})
     target_link_libraries(slam ${OpenCV_LIBS} realsense2)
 endif()
 
@@ -29,8 +29,8 @@ if(${CMAKE_SYSTEM_PROCESSOR} STREQUAL "x86_64")
     #target_link_libraries(main PRIVATE realsense2::fw realsense2::rsutils realsense2::realsense2 realsense2::realsense-file)
     # opencv
     find_package( OpenCV REQUIRED )
-    target_include_directories(slam ${OpenCV_INCLUDE_DIRS})
-    target_include_directories(slam ${INCLUDE_DIRS})
+    target_include_directories(slam PRIVATE ${OpenCV_INCLUDE_DIRS})
+    target_include_directories(slam PRIVATE ${INCLUDE_DIRS})
     target_link_libraries( slam ${OpenCV_LIBS} realsense2 )
 endif()
 
