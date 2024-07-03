@@ -48,8 +48,8 @@ int main()
         //Instruct pipeline to start streaming with the requested configuration
         rs2::pipeline_profile pipeline_profile = pipe.start(cfg);
         
-        rs2::align find_stream_to_align(pipeline_profile.get_streams());
-
+        rs2_stream align_to = find_stream_to_align(pipeline_profile.get_streams());
+        rs2::align align(align_to);
         //Display time
         const auto window_name = "Display Image";
         cv::namedWindow(window_name, cv::WINDOW_AUTOSIZE);
@@ -60,7 +60,7 @@ int main()
             rs2::frameset frames, aligned_frames;
             try {
                 frames = pipe.wait_for_frames();
-                aligned_frames = align_to.process(frames);
+                aligned_frames = align.process(frames);
             } catch (const rs2::error & e) {
                 std::cerr << "RealSense error calling " << e.get_failed_function() << "(" << e.get_failed_args() << "):\n" << e.what() << std::endl;
                 continue;
