@@ -9,22 +9,29 @@ using namespace cv;
 class FrameProcessor
 {
     private:
-        cv::Ptr<cv::ORB> pOrb;
-        float depthScale;
+        cv::Ptr<cv::ORB> _pOrb;
+        float _depthScale;
     public:
-        FrameProcessor() {
+        FrameProcessor() 
+        {
             std::cout << "Constructing frame processor object." << std::endl;
-            pOrb = cv::ORB::create(); 
-        };
-
-        void wrapGoodFeatures(cv::Mat &inputFrame, cv::Mat &depthFrame) {
-            const auto goodFeatsWindow = "Good Features Image";
-            cv::namedWindow(goodFeatsWindow, cv::WINDOW_AUTOSIZE);
-
-            cv::Mat workFrame, grayFrame;
+            try {
+                _pOrb = cv::ORB::create();
+            }
+            catch(...) {
+                std::cout << "Error: with cv::ORB::create() in constructor." << std::endl;
+            }
+        }
+        void set_depthScale(float ds) 
+        {
+            _depthScale = ds;
+        }
+        void wrapGoodFeatures(cv::Mat &inputFrame, cv::Mat &depthFrame, cv::Mat &outputFrame) 
+        {
+            cv::Mat grayFrame;
             std::vector<cv::Point2f> corners;
-            inputFrame.copyTo(workFrame);
-            cv::cvtColor(workFrame, grayFrame, COLOR_BGR2GRAY);
+            inputFrame.copyTo(outputFrame);
+            cv::cvtColor(outputFrame, grayFrame, COLOR_BGR2GRAY);
 
             //Parameters should move elswhere
             int max_count = 100; 
@@ -39,25 +46,21 @@ class FrameProcessor
             {
                 kps1.emplace_back(cv::KeyPoint(corner, 1.f));
             }
-            this->pOrb->compute(inputFrame, kps1, des1);
+            _pOrb->compute(inputFrame, kps1, des1);
             
             // cv::Mat des1;
-            // this->pOrb->compute(inputFrame, kps1, des1);
+            // this->_pOrb->compute(inputFrame, kps1, des1);
             std::cout << "Keypoints Size: " << kps1.size() << std::endl;
 
             //Drawing the features
             int radius = 2;
             for(auto &corner : corners)
             {
-                cv::circle(workFrame, corner, radius, cv::Scalar(0, 255, 0));
-            }
-            while(cv::waitKey(1))
-            {
-                cv::imshow(goodFeatsWindow, workFrame);
+                cv::circle(outputFrame, corner, radius, cv::Scalar(0, 255, 0));
             }
 
             return;
-        };
+        }
 
 };
 
@@ -65,9 +68,19 @@ class FrameProcessor
 int main()
 {
     cv::Mat inputFrame = cv::imread("./test-image.png", IMREAD_COLOR);
-    cv::Mat depthFrame;
+    cv::Mat depthFrame, outputFrame
+
+    //Testing fp_ptr
     std::unique_ptr<FrameProcessor> fp_ptr = std::make_unique<FrameProcessor>();
-    fp_ptr->wrapGoodFeatures(inputFrame, depthFrame);
+    fp_ptr->wrapGoodFeatures(inputFrame, depthFrame, outputFrame);
+    const auto goodFeatsWindow = "Good Features Image"; 
+    cv::namedWindow(goodFeatsWindow, cv::WINDOW_AUTOSIZE);
+    
+    while(cv::waitKey(1))
+    {
+        cv::imshow(goodFeatsWindow, outputFrame);
+    }
+
 
     bool doPipeline = false;
     if(doPipeline)
