@@ -65,7 +65,7 @@ int main()
             }
             rs2::frameset aligned_frames = align_to.process(frames);
             //From: https://github.com/GruffyPuffy/imutest/blob/master/imutest.cpp
-            for (auto f : aligned_frames)
+            for (auto f : frames)
             {
                 rs2::stream_profile profile = f.get_profile();
 
@@ -74,7 +74,7 @@ int main()
                 dt[profile.stream_type()] = (ts - last_ts[profile.stream_type()] ) / 1000.0;
                 last_ts[profile.stream_type()] = ts;
 
-                std::cout << "[ " << profile.stream_name() << " fnum: " << fnum << " dt: " << dt[profile.stream_type()] << "] ";
+                std::cout << "[ " << profile.stream_name() << " fnum: " << fnum << " dt: " << dt[profile.stream_type()] << "] \n";
             }
             
             //Get the frames
@@ -84,7 +84,7 @@ int main()
             rs2::motion_frame accel = accel_frame.as<rs2::motion_frame>();
             rs2::frame gyro_frame = aligned_frames.first(RS2_STREAM_GYRO, RS2_FORMAT_MOTION_XYZ32F);
             rs2::motion_frame gyro = gyro_frame.as<rs2::motion_frame>();
-
+            //helper function: auto depth_mat = depth_frame_to_meters(pipe, depth_frame);
             // printf("frames length: %li, aligned_frames length: %li\n", frames.size(), aligned_frames.size());
 
             if (!aligned_depth_frame  || !color_frame) 
