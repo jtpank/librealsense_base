@@ -9,6 +9,8 @@
 using namespace std;
 
 
+#define CAPACITY 8
+
 
 //TODO:
 //1. Grab depth frame, vis frame, gyro, and accel frame
@@ -27,7 +29,13 @@ int main()
 
     bool doPipeline = true;
     try {
-    if(doPipeline)
+        rs2::context ctx;
+        auto list = ctx.query_devices(); // Get a snapshot of currently connected devices
+        if (list.size() == 0) 
+            throw std::runtime_error("No device detected. Is it plugged in?");
+        rs2::device dev = list.front();
+        //https://github.com/IntelRealSense/librealsense/wiki/API-How-To#do-processing-on-a-background-thread
+        if(doPipeline)
         {
             // Declare the RealSense pipeline, encapsulating the actual device and sensors
             rs2::pipeline pipe;
