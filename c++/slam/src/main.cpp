@@ -57,7 +57,7 @@ int main()
                 continue;
             }
 
-            printf("frames length: %i\n", frames.size());
+            printf("frames length: %li\n", frames.size());
             //Get each frame
             // rs2::frame ir_frame = frames.get_infrared_frame(1);
             // rs2::frame ir_frame_2 = frames.get_infrared_frame(2);
@@ -67,11 +67,11 @@ int main()
                 continue;
             }
             // Creating OpenCV matrix from IR image
-            cv::Mat depth_img(cv::Size(640, 480), cv::CV_8UC1, (void*)depth_frame.get_data(), cv::Mat::AUTO_STEP);
+            cv::Mat depth_img(cv::Size(640, 480), CV_8UC1, (void*)depth_frame.get_data(), cv::Mat::AUTO_STEP);
 
             // Apply Histogram Equalization
             // equalizeHist( ir, ir );
-            cv::applyColorMap(depth_img, depth_img, cv:COLORMAP_JET);
+            cv::applyColorMap(depth_img, depth_img, cv::COLORMAP_JET);
             cv::imshow(window_name, depth_img);
         }
     }
