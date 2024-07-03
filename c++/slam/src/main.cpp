@@ -31,7 +31,6 @@ int main()
         // Declare the RealSense pipeline, encapsulating the actual device and sensors
         rs2::pipeline pipe;
         rs2::colorizer color_map;
-        rs2::align align_to(RS2_STREAM_COLOR);
         //Create a configuration for configuring the pipeline with a non default profile
         rs2::config cfg;
 
@@ -48,6 +47,8 @@ int main()
 
         //Instruct pipeline to start streaming with the requested configuration
         pipe.start(cfg);
+        
+        rs2::align align_to(RS2_STREAM_COLOR);
 
         //Display time
         const auto window_name = "Display Image";
