@@ -48,6 +48,7 @@ int main()
         //Instruct pipeline to start streaming with the requested configuration
         rs2::pipeline_profile pipeline_profile = pipe.start(cfg);
         
+        //Very important for aligning frames
         rs2::align align(RS2_STREAM_COLOR);
         //Display time
         const auto window_name = "Display Image";
