@@ -61,25 +61,30 @@ class FrameProcessor
 
             return;
         }
-
 };
 
-
-int main()
+void test_fpPtr_wrapGoodFeatures(std::unique_ptr<FrameProcessor> &fp_ptr)
 {
     cv::Mat inputFrame = cv::imread("./test-image.png", IMREAD_COLOR);
-    cv::Mat depthFrame, outputFrame
+    cv::Mat depthFrame, outputFrame;
 
-    //Testing fp_ptr
-    std::unique_ptr<FrameProcessor> fp_ptr = std::make_unique<FrameProcessor>();
     fp_ptr->wrapGoodFeatures(inputFrame, depthFrame, outputFrame);
     const auto goodFeatsWindow = "Good Features Image"; 
     cv::namedWindow(goodFeatsWindow, cv::WINDOW_AUTOSIZE);
-    
+
     while(cv::waitKey(1))
     {
         cv::imshow(goodFeatsWindow, outputFrame);
     }
+
+}
+
+int main()
+{
+    //Testing fp_ptr
+    std::unique_ptr<FrameProcessor> fp_ptr = std::make_unique<FrameProcessor>();
+
+    test_fpPtr_wrapGoodFeatures(fp_ptr);
 
 
     bool doPipeline = false;
