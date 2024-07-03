@@ -65,7 +65,7 @@ int main()
             }
             rs2::frameset aligned_frames = align_to.process(frames);
             //From: https://github.com/GruffyPuffy/imutest/blob/master/imutest.cpp
-            for (auto &f : aligned_frames)
+            for (auto f : aligned_frames)
             {
                 rs2::stream_profile profile = f.get_profile();
 
