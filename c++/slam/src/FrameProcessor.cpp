@@ -30,10 +30,11 @@ void FrameProcessor::frameConsumer(int threadId)
 
                 unsigned long fnum = f.get_frame_number();
                 double ts = f.get_timestamp();
-                dt[profile.stream_type()] = (ts - last_ts[profile.stream_type()] ) / 1000.0;
-                last_ts[profile.stream_type()] = ts;
+                // dt[profile.stream_type()] = (ts - last_ts[profile.stream_type()] ) / 1000.0;
+                // last_ts[profile.stream_type()] = ts;
 
-                std::cout << " threadId: " << threadId << " [ " << profile.stream_name() << " fnum: " << fnum << " dt: " << dt[profile.stream_type()] << "] \n";
+                std::cout << " threadId: " << threadId << " [ " << profile.stream_name() << " fnum: " << fnum << " ts: " << ts << "]\n";
+                //" dt: " << dt[profile.stream_type()] << "] \n";
             }
             
             //Get the frames
