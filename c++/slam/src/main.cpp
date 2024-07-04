@@ -97,7 +97,7 @@ int main()
             rs2::frame gyro_frame = aligned_frames.first(RS2_STREAM_GYRO, RS2_FORMAT_MOTION_XYZ32F);
             rs2::motion_frame gyro = gyro_frame.as<rs2::motion_frame>();
 
-            std::thread colorThread( [&color_frame, fp_ptr, &color_window_name]() { 
+            std::thread colorThread( [&color_frame, fp_ptr = std::move(fp_ptr), &color_window_name]() { 
                 if(color_frame)
                 {
                     cv::Mat color_image(cv::Size(640, 480), CV_8UC3, (void*)color_frame.get_data(), cv::Mat::AUTO_STEP);
