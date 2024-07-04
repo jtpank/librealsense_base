@@ -112,9 +112,9 @@ int main()
             // // cv::hconcat(color_image, depth_colormap, both_images);
 
             // cv::imshow(windowName, color_image);
-            cv::Mat bothImages;
-            cv::hconcat(outputFrame, depthColormap, bothImages);
-            cv::imshow(windowName, bothImages);
+            // cv::Mat bothImages;
+            // cv::hconcat(outputFrame, depthColormap, bothImages);
+            // cv::imshow(windowName, bothImages);
         }
     }
     catch (const rs2::error & e)
