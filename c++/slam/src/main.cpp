@@ -64,8 +64,8 @@ int main()
         // const auto depth_window_name = "Depth Image";
         // cv::namedWindow(color_window_name, cv::WINDOW_AUTOSIZE);
         // cv::namedWindow(depth_window_name, cv::WINDOW_AUTOSIZE);
-        const auto windowName = "Depth and Color Images";
-        cv::namedWindow(windowName, cv::WINDOW_AUTOSIZE);
+        // const auto windowName = "Depth and Color Images";
+        // cv::namedWindow(windowName, cv::WINDOW_AUTOSIZE);
         std::unique_ptr<FrameProcessor> fp_ptr = std::make_unique<FrameProcessor>(n_threads);
         //&& cv::getWindowProperty(windowName, cv::WND_PROP_AUTOSIZE) >= 0
         while(cv::waitKey(1) < 0 && cv::getWindowProperty(windowName, cv::WND_PROP_AUTOSIZE) >= 0)
@@ -81,18 +81,17 @@ int main()
                 continue;
             }
             fp_ptr->processFrameset(aligned_frames);
+
+            rs2::frame color_frame = aligned_frames.get_color_frame();
+            cv::Mat color_image(cv::Size(640, 480), CV_8UC3, (void*)color_frame.get_data(), cv::Mat::AUTO_STEP);
+            cv::imshow(windowName, color_image);
+
             auto end = std::chrono::high_resolution_clock::now();
             std::chrono::duration<double, std::milli> duration = end - start;
 
             // Output the duration in milliseconds
             std::cout << "Elapsed time: " << duration.count() << " ms " << " Framerate: " << (1000.0 / duration.count()) << " hz" << std::endl;
         
-
-            // rs2::frame color_frame = aligned_frames.get_color_frame();
-            // cv::Mat color_image(cv::Size(640, 480), CV_8UC3, (void*)color_frame.get_data(), cv::Mat::AUTO_STEP);
-            // cv::imshow(windowName, color_image);
-
-
 
 
             //replace the following in the frame processor method
