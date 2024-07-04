@@ -65,7 +65,7 @@ int main()
         // cv::namedWindow(depth_window_name, cv::WINDOW_AUTOSIZE);
         const auto windowName = "Depth and Color Images";
         cv::namedWindow(windowName, cv::WINDOW_AUTOSIZE);
-
+        cv::Ptr<cv::ORB> m_pOrb = cv::ORB::create();
         // std::unique_ptr<FrameProcessor> fp_ptr = std::make_unique<FrameProcessor>(n_threads);
         //&& cv::getWindowProperty(windowName, cv::WND_PROP_AUTOSIZE) >= 0
         while(cv::waitKey(1) < 0 && cv::getWindowProperty(windowName, cv::WND_PROP_AUTOSIZE) >= 0)
@@ -99,13 +99,42 @@ int main()
             // rs2::frame gyro_frame = aligned_frames.first(RS2_STREAM_GYRO, RS2_FORMAT_MOTION_XYZ32F);
             // rs2::motion_frame gyro = gyro_frame.as<rs2::motion_frame>();
             cv::Mat depthColormap, outputFrame;
-            std::thread colorThread( [&aligned_frames, &outputFrame]() { 
+            std::thread colorThread( [&aligned_frames, &outputFrame, m_pOrb]() { 
                 rs2::frame color_frame = aligned_frames.get_color_frame();
                 if(color_frame)
-                {
+                {  
                     cv::Mat color_image(cv::Size(640, 480), CV_8UC3, (void*)color_frame.get_data(), cv::Mat::AUTO_STEP);
+                    cv::Mat grayFrame;
+                    std::vector<cv::Point2f> corners;
                     color_image.copyTo(outputFrame);
-                    // fp_ptr->wrapGoodFeatures(color_image, outputFrame);
+                    cv::cvtColor(outputFrame, grayFrame, cv::COLOR_BGR2GRAY);
+
+                    //Parameters should move elswhere
+                    int max_count = 100; 
+                    double quality_level = 0.01; 
+                    double min_distance = 3;
+                    cv::goodFeaturesToTrack(grayFrame, corners, max_count, quality_level, min_distance);
+                    std::cout << "Corners length: " << corners.size() << std::endl;
+
+                    std::vector<cv::KeyPoint> kps1;
+                    cv::Mat des1;
+                    for(auto &corner : corners)
+                    {
+                        kps1.emplace_back(cv::KeyPoint(corner, 1.f));
+                    }
+                    m_pOrb->compute(color_image, kps1, des1);
+                    
+                    // cv::Mat des1;
+                    // this->m_pOrb->compute(color_image, kps1, des1);
+                    std::cout << "Keypoints Size: " << kps1.size() << std::endl;
+
+                    //Drawing the features
+                    int radius = 2;
+                    for(auto &corner : corners)
+                    {
+                        cv::circle(outputFrame, corner, radius, cv::Scalar(0, 255, 0));
+                    }
+
                 }
             });
             std::thread depthThread( [&aligned_frames, &depthColormap]() { 
