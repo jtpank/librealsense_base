@@ -66,7 +66,7 @@ int main()
         const auto windowName = "Depth and Color Images";
         cv::namedWindow(windowName, cv::WINDOW_AUTOSIZE);
 
-        std::unique_ptr<FrameProcessor> fp_ptr = std::make_unique<FrameProcessor>(n_threads);
+        // std::unique_ptr<FrameProcessor> fp_ptr = std::make_unique<FrameProcessor>(n_threads);
         //&& cv::getWindowProperty(windowName, cv::WND_PROP_AUTOSIZE) >= 0
         while(cv::waitKey(1) < 0 && cv::getWindowProperty(windowName, cv::WND_PROP_AUTOSIZE) >= 0)
         {
@@ -99,11 +99,12 @@ int main()
             rs2::frame gyro_frame = aligned_frames.first(RS2_STREAM_GYRO, RS2_FORMAT_MOTION_XYZ32F);
             rs2::motion_frame gyro = gyro_frame.as<rs2::motion_frame>();
             cv::Mat depthColormap, outputFrame;
-            std::thread colorThread( [&color_frame, fp_ptr = std::move(fp_ptr), &outputFrame]() { 
+            std::thread colorThread( [&color_frame, &outputFrame]() { 
                 if(color_frame)
                 {
                     cv::Mat color_image(cv::Size(640, 480), CV_8UC3, (void*)color_frame.get_data(), cv::Mat::AUTO_STEP);
-                    fp_ptr->wrapGoodFeatures(color_image, outputFrame);
+                    color_image.copyTo(outputFrame);
+                    // fp_ptr->wrapGoodFeatures(color_image, outputFrame);
                 }
             });
             std::thread depthThread( [&aligned_depth_frame, &depthColormap]() { 
