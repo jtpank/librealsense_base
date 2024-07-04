@@ -1,6 +1,7 @@
 #pragma once
 #include <opencv2/opencv.hpp>
 #include <opencv2/features2d.hpp>
+#include <librealsense2/rs.hpp> 
 #include "FrameBuffer.hpp"
 #include <iostream>
 #include <thread>
@@ -15,11 +16,12 @@ class FrameProcessor
         float m_depthScale;
         unsigned int m_poolSize;
         std::vector<std::thread> m_pool;
-        FrameBuffer<int> m_frameBuffer;
+        FrameBuffer<rs2::frameset> m_frameBuffer;
 
     public:
         FrameProcessor(unsigned int poolSize);
-        void processFrame(int threadId);
+        void frameConsumer(int threadId);
+        void processFrameset(rs2::frameset& frameSet);
         void set_depthScale(float depthScale);
         void wrapGoodFeatures(cv::Mat &inputFrame, cv::Mat &depthFrame, cv::Mat &outputFrame);
         void test_wrapGoodFeatures();

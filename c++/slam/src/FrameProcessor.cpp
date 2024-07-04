@@ -9,7 +9,7 @@ FrameProcessor::FrameProcessor(unsigned int poolSize) : m_pOrb(cv::ORB::create()
         //this leads to terminate called without an active exception
         // Aborted (core dumped)
         try {
-             m_pool.emplace_back(std::thread( [=]() { processFrame(i); }));
+             m_pool.emplace_back(std::thread( [=]() { frameConsumer(i); }));
         } catch (const std::exception& e) {
             std::cerr << "Exception during thread creation: " << e.what() << std::endl;
             throw;
@@ -17,9 +17,22 @@ FrameProcessor::FrameProcessor(unsigned int poolSize) : m_pOrb(cv::ORB::create()
     }
 }
 
-void FrameProcessor::processFrame(int threadId)
+void FrameProcessor::frameConsumer(int threadId)
 {
-    std::cout << "thread number: " << threadId << std::endl;
+    while(true)
+    {
+        try{
+            
+            std::cout << "thread number: " << threadId << std::endl;
+        }
+        catch(const std::runtime_error &e){
+        }
+    }
+}
+
+void FrameProcessor::processFrameset(rs2::frameset& frameSet)
+{
+    m_frameBuffer.add(frameSet);
 }
 
 void FrameProcessor::set_depthScale(float depthScale) 

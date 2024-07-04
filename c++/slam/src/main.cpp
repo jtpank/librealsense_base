@@ -61,10 +61,11 @@ int main()
         //Very important for aligning frames
         rs2::align align(RS2_STREAM_COLOR);
         //Display time
-        const auto window_name = "Display Image";
-        cv::namedWindow(window_name, cv::WINDOW_AUTOSIZE);
+        // const auto window_name = "Display Image";
+        // cv::namedWindow(window_name, cv::WINDOW_AUTOSIZE);
 
-        while (cv::waitKey(1) < 0 && cv::getWindowProperty(window_name, cv::WND_PROP_AUTOSIZE) >= 0)
+        // while (cv::waitKey(1) < 0 && cv::getWindowProperty(window_name, cv::WND_PROP_AUTOSIZE) >= 0)
+        while(true)
         {
             // Camera warmup - dropping several first frames to let auto-exposure stabilize
             rs2::frameset frames, aligned_frames;
@@ -75,6 +76,11 @@ int main()
                 std::cerr << "RealSense error calling " << e.get_failed_function() << "(" << e.get_failed_args() << "):\n" << e.what() << std::endl;
                 continue;
             }
+
+
+
+            //replace the following in the frame processor method
+
             //From: https://github.com/GruffyPuffy/imutest/blob/master/imutest.cpp
             for (auto f : aligned_frames)
             {
@@ -121,18 +127,18 @@ int main()
                 std::cout << "gvx=" << gvx << " gvy=" << gvy << " gvz=" << gvz << std::endl;
             }
             // Creating OpenCV matrix for image
-            cv::Mat color_image(cv::Size(640, 480), CV_8UC3, (void*)color_frame.get_data(), cv::Mat::AUTO_STEP);
-            cv::Mat depth_image(cv::Size(640, 480), CV_16UC1, (void*)aligned_depth_frame.get_data(), cv::Mat::AUTO_STEP);
+            // cv::Mat color_image(cv::Size(640, 480), CV_8UC3, (void*)color_frame.get_data(), cv::Mat::AUTO_STEP);
+            // cv::Mat depth_image(cv::Size(640, 480), CV_16UC1, (void*)aligned_depth_frame.get_data(), cv::Mat::AUTO_STEP);
 
-            cv::Mat depth_colormap;
-            depth_image.convertTo(depth_colormap, CV_8UC1, 0.03);
-            cv::applyColorMap(depth_colormap, depth_colormap, cv::COLORMAP_JET);
+            // cv::Mat depth_colormap;
+            // depth_image.convertTo(depth_colormap, CV_8UC1, 0.03);
+            // cv::applyColorMap(depth_colormap, depth_colormap, cv::COLORMAP_JET);
 
-            // Concatenate color and depth frames horizontally
-            cv::Mat both_images;
-            cv::hconcat(color_image, depth_colormap, both_images);
+            // // Concatenate color and depth frames horizontally
+            // cv::Mat both_images;
+            // cv::hconcat(color_image, depth_colormap, both_images);
 
-            cv::imshow(window_name, both_images);
+            // cv::imshow(window_name, both_images);
         }
     }
     catch (const rs2::error & e)
