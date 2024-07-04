@@ -172,7 +172,7 @@ int main()
             std::chrono::duration<double, std::milli> duration = end - start;
 
             // Output the duration in milliseconds
-            std::cout << "Elapsed time: " << duration.count() << " ms " << " Framerate: " << (1.0 / (1000.0 * duration.count()) ) << " hz" << std::endl;
+            std::cout << "Elapsed time: " << duration.count() << " ms " << " Framerate: " << (1000.0 / duration.count()) << " hz" << std::endl;
             
             cv::Mat bothImages;
             cv::hconcat(outputFrame, depthColormap, bothImages);
