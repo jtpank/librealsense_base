@@ -63,12 +63,12 @@ int main()
         // const auto depth_window_name = "Depth Image";
         // cv::namedWindow(color_window_name, cv::WINDOW_AUTOSIZE);
         // cv::namedWindow(depth_window_name, cv::WINDOW_AUTOSIZE);
-        const auto window_name = "Depth and Color Images";
-        cv::namedWindow(window_name, cv::WINDOW_AUTOSIZE);
+        const auto windowName = "Depth and Color Images";
+        cv::namedWindow(windowName, cv::WINDOW_AUTOSIZE);
 
         std::unique_ptr<FrameProcessor> fp_ptr = std::make_unique<FrameProcessor>(n_threads);
-        //&& cv::getWindowProperty(window_name, cv::WND_PROP_AUTOSIZE) >= 0
-        while(cv::waitKey(1) < 0 && cv::getWindowProperty(window_name, cv::WND_PROP_AUTOSIZE) >= 0)
+        //&& cv::getWindowProperty(windowName, cv::WND_PROP_AUTOSIZE) >= 0
+        while(cv::waitKey(1) < 0 && cv::getWindowProperty(windowName, cv::WND_PROP_AUTOSIZE) >= 0)
         {
             // Camera warmup - dropping several first frames to let auto-exposure stabilize
             rs2::frameset frames, aligned_frames;
@@ -98,7 +98,7 @@ int main()
             rs2::motion_frame accel = accel_frame.as<rs2::motion_frame>();
             rs2::frame gyro_frame = aligned_frames.first(RS2_STREAM_GYRO, RS2_FORMAT_MOTION_XYZ32F);
             rs2::motion_frame gyro = gyro_frame.as<rs2::motion_frame>();
-            cv::Mat depth_colormap, outputFrame;
+            cv::Mat depthColormap, outputFrame;
             std::thread colorThread( [&color_frame, fp_ptr = std::move(fp_ptr), &outputFrame]() { 
                 if(color_frame)
                 {
@@ -106,13 +106,13 @@ int main()
                     fp_ptr->wrapGoodFeatures(color_image, outputFrame);
                 }
             });
-            std::thread depthThread( [&aligned_depth_frame, &depth_colormap]() { 
+            std::thread depthThread( [&aligned_depth_frame, &depthColormap]() { 
                 if(aligned_depth_frame)
                 {
                     // cv::Mat depth_colormap;
                     cv::Mat depth_image(cv::Size(640, 480), CV_16UC1, (void*)aligned_depth_frame.get_data(), cv::Mat::AUTO_STEP);
-                    depth_image.convertTo(depth_colormap, CV_8UC1, 0.03);
-                    cv::applyColorMap(depth_colormap, depth_colormap, cv::COLORMAP_JET);
+                    depth_image.convertTo(depthColormap, CV_8UC1, 0.03);
+                    cv::applyColorMap(depthColormap, depthColormap, cv::COLORMAP_JET);
                 }
             });
             std::thread imuThread( [&gyro, &accel, dt]() { 
@@ -139,9 +139,9 @@ int main()
             depthThread.join();
             imuThread.join();
 
-            cv::Mat both_images;
-            cv::hconcat(color_image, depth_colormap, both_images);
-            cv::imshow(window_name, output_frame);
+            cv::Mat bothImages;
+            cv::hconcat(outputFrame, depthColormap, bothImages);
+            cv::imshow(windowName, bothImages);
 
 
 
