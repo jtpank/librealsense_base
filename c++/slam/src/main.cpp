@@ -96,25 +96,26 @@ int main()
             rs2::frame gyro_frame = aligned_frames.first(RS2_STREAM_GYRO, RS2_FORMAT_MOTION_XYZ32F);
             rs2::motion_frame gyro = gyro_frame.as<rs2::motion_frame>();
 
-            std::thread colorThread( [&color_frame]() { 
+            std::thread colorThread( [&color_frame, fp_ptr, &color_window_name]() { 
                 if(color_frame)
                 {
                     cv::Mat color_image(cv::Size(640, 480), CV_8UC3, (void*)color_frame.get_data(), cv::Mat::AUTO_STEP);
                     cv::Mat outputFrame;
-                    fp_ptr->wrapGoodFeatures(color_image, output_frame);
-                    cv::imshow(color_window_name, output_frame);
+                    fp_ptr->wrapGoodFeatures(color_image, outputFrame);
+                    cv::imshow(color_window_name, outputFrame);
                 }
             });
-            std::thread depthThread( [&aligned_depth_frame]() { 
+            std::thread depthThread( [&aligned_depth_frame, &depth_window_name]() { 
                 if(aligned_depth_frame)
                 {
+                    cv::Mat depth_colormap;
                     cv::Mat depth_image(cv::Size(640, 480), CV_16UC1, (void*)aligned_depth_frame.get_data(), cv::Mat::AUTO_STEP);
                     depth_image.convertTo(depth_colormap, CV_8UC1, 0.03);
                     cv::applyColorMap(depth_colormap, depth_colormap, cv::COLORMAP_JET);
                     cv::imshow(depth_window_name, depth_colormap);
                 }
             });
-            std::thread imuThread( [&gyro, &accel, dt[0]]() { 
+            std::thread imuThread( [&gyro, &accel, dt]() { 
                 if (accel)
                 {
                     rs2_vector av = accel.get_motion_data();
