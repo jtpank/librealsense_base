@@ -27,7 +27,7 @@ FrameProcessor::FrameProcessor(unsigned int poolSize)
 
 void FrameProcessor::processFrame(int threadId)
 {
-    return;
+    std::cout << "thread number: " << threadId << std::endl;
 }
 
 void FrameProcessor::set_depthScale(float depthScale) 
