@@ -58,13 +58,13 @@ int main()
         //Very important for aligning frames
         rs2::align align(RS2_STREAM_COLOR);
         //Display time
-        // const auto window_name = "Display Image";
-        // cv::namedWindow(window_name, cv::WINDOW_AUTOSIZE);
+        const auto window_name = "Display Image";
+        cv::namedWindow(window_name, cv::WINDOW_AUTOSIZE);
 
         // while (cv::waitKey(1) < 0 && cv::getWindowProperty(window_name, cv::WND_PROP_AUTOSIZE) >= 0)
 
         std::unique_ptr<FrameProcessor> fp_ptr = std::make_unique<FrameProcessor>(n_threads);
-        while(true)
+        while(cv::waitKey(1) < 0 && cv::getWindowProperty(window_name, cv::WND_PROP_AUTOSIZE) >= 0)
         {
             // Camera warmup - dropping several first frames to let auto-exposure stabilize
             rs2::frameset frames, aligned_frames;
@@ -81,7 +81,8 @@ int main()
             //replace the following in the frame processor method
 
             // Creating OpenCV matrix for image
-            // cv::Mat color_image(cv::Size(640, 480), CV_8UC3, (void*)color_frame.get_data(), cv::Mat::AUTO_STEP);
+            rs2::frame color_frame = aligned_frames.get_color_frame();
+            cv::Mat color_image(cv::Size(640, 480), CV_8UC3, (void*)color_frame.get_data(), cv::Mat::AUTO_STEP);
             // cv::Mat depth_image(cv::Size(640, 480), CV_16UC1, (void*)aligned_depth_frame.get_data(), cv::Mat::AUTO_STEP);
 
             // cv::Mat depth_colormap;
@@ -92,7 +93,7 @@ int main()
             // cv::Mat both_images;
             // cv::hconcat(color_image, depth_colormap, both_images);
 
-            // cv::imshow(window_name, both_images);
+            cv::imshow(window_name, color_image);
         }
     }
     catch (const rs2::error & e)
