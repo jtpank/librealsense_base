@@ -92,14 +92,15 @@ int main()
 
 
 
-            rs2::frame color_frame = aligned_frames.get_color_frame();
-            rs2::depth_frame aligned_depth_frame = aligned_frames.get_depth_frame();
-            rs2::frame accel_frame = aligned_frames.first(RS2_STREAM_ACCEL, RS2_FORMAT_MOTION_XYZ32F);
-            rs2::motion_frame accel = accel_frame.as<rs2::motion_frame>();
-            rs2::frame gyro_frame = aligned_frames.first(RS2_STREAM_GYRO, RS2_FORMAT_MOTION_XYZ32F);
-            rs2::motion_frame gyro = gyro_frame.as<rs2::motion_frame>();
+            // rs2::frame color_frame = aligned_frames.get_color_frame();
+            // rs2::depth_frame aligned_depth_frame = aligned_frames.get_depth_frame();
+            // rs2::frame accel_frame = aligned_frames.first(RS2_STREAM_ACCEL, RS2_FORMAT_MOTION_XYZ32F);
+            // rs2::motion_frame accel = accel_frame.as<rs2::motion_frame>();
+            // rs2::frame gyro_frame = aligned_frames.first(RS2_STREAM_GYRO, RS2_FORMAT_MOTION_XYZ32F);
+            // rs2::motion_frame gyro = gyro_frame.as<rs2::motion_frame>();
             cv::Mat depthColormap, outputFrame;
-            std::thread colorThread( [&color_frame, &outputFrame]() { 
+            std::thread colorThread( [&aligned_frames, &outputFrame]() { 
+                rs2::frame color_frame = aligned_frames.get_color_frame();
                 if(color_frame)
                 {
                     cv::Mat color_image(cv::Size(640, 480), CV_8UC3, (void*)color_frame.get_data(), cv::Mat::AUTO_STEP);
@@ -107,7 +108,8 @@ int main()
                     // fp_ptr->wrapGoodFeatures(color_image, outputFrame);
                 }
             });
-            std::thread depthThread( [&aligned_depth_frame, &depthColormap]() { 
+            std::thread depthThread( [&aligned_frames, &depthColormap]() { 
+                rs2::depth_frame aligned_depth_frame = aligned_frames.get_depth_frame();
                 if(aligned_depth_frame)
                 {
                     // cv::Mat depth_colormap;
@@ -116,7 +118,11 @@ int main()
                     cv::applyColorMap(depthColormap, depthColormap, cv::COLORMAP_JET);
                 }
             });
-            std::thread imuThread( [&gyro, &accel, dt]() { 
+            std::thread imuThread( [&aligned_frames, dt]() { 
+                rs2::frame accel_frame = aligned_frames.first(RS2_STREAM_ACCEL, RS2_FORMAT_MOTION_XYZ32F);
+                rs2::motion_frame accel = accel_frame.as<rs2::motion_frame>();
+                rs2::frame gyro_frame = aligned_frames.first(RS2_STREAM_GYRO, RS2_FORMAT_MOTION_XYZ32F);
+                rs2::motion_frame gyro = gyro_frame.as<rs2::motion_frame>();
                 if (accel)
                 {
                     rs2_vector av = accel.get_motion_data();
