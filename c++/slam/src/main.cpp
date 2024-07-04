@@ -8,6 +8,7 @@
 #include <memory>
 #include <thread>
 #include <cstdio>
+#include <chrono>
 
 using namespace std;
 
@@ -70,6 +71,7 @@ int main()
         //&& cv::getWindowProperty(windowName, cv::WND_PROP_AUTOSIZE) >= 0
         while(cv::waitKey(1) < 0 && cv::getWindowProperty(windowName, cv::WND_PROP_AUTOSIZE) >= 0)
         {
+            auto start = std::chrono::high_resolution_clock::now();
             // Camera warmup - dropping several first frames to let auto-exposure stabilize
             rs2::frameset frames, aligned_frames;
             try {
@@ -90,14 +92,6 @@ int main()
                 last_ts[profile.stream_type()] = ts;
             }
 
-
-
-            // rs2::frame color_frame = aligned_frames.get_color_frame();
-            // rs2::depth_frame aligned_depth_frame = aligned_frames.get_depth_frame();
-            // rs2::frame accel_frame = aligned_frames.first(RS2_STREAM_ACCEL, RS2_FORMAT_MOTION_XYZ32F);
-            // rs2::motion_frame accel = accel_frame.as<rs2::motion_frame>();
-            // rs2::frame gyro_frame = aligned_frames.first(RS2_STREAM_GYRO, RS2_FORMAT_MOTION_XYZ32F);
-            // rs2::motion_frame gyro = gyro_frame.as<rs2::motion_frame>();
             cv::Mat depthColormap, outputFrame;
             std::thread colorThread( [&aligned_frames, &outputFrame, m_pOrb]() { 
                 rs2::frame color_frame = aligned_frames.get_color_frame();
@@ -159,7 +153,7 @@ int main()
                     float newRoll   = acos(av.x / R);
                     float newYaw    = acos(av.y / R);
                     float newPitch  = acos(av.z / R);
-                    std::cout << "accX=" << newRoll << " accY=" << newYaw << " accZ=" << newPitch << std::endl;
+                    // std::cout << "accX=" << newRoll << " accY=" << newYaw << " accZ=" << newPitch << std::endl;
                 }
                 if (gyro)
                 {
@@ -167,7 +161,7 @@ int main()
                     float gvx   = gv.x;
                     float gvy   = gv.y;
                     float gvz   = gv.z;
-                    std::cout << "gvx=" << gvx << " gvy=" << gvy << " gvz=" << gvz << std::endl;
+                    // std::cout << "gvx=" << gvx << " gvy=" << gvy << " gvz=" << gvz << std::endl;
                 }
             });
 
@@ -178,7 +172,11 @@ int main()
             cv::Mat bothImages;
             cv::hconcat(outputFrame, depthColormap, bothImages);
             cv::imshow(windowName, bothImages);
+            auto end = std::chrono::high_resolution_clock::now();
+            std::chrono::duration<double, std::milli> duration = end - start;
 
+            // Output the duration in milliseconds
+            std::cout << "Elapsed time: " << duration.count() << " ms " << " Framerate: " << (1.0 / duration.count() ) << " hz" << std::endl;
 
 
 
