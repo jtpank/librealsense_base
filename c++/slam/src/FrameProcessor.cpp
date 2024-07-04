@@ -1,18 +1,36 @@
 #include "FrameProcessor.hpp"
 
-FrameProcessor::FrameProcessor() 
-{
-    std::cout << "Constructing frame processor object." << std::endl;
+FrameProcessor::FrameProcessor(unsigned int poolSize) 
+{   
+    std::cout << "Constructing frame processor object: " << std::endl;
     try {
-        _pOrb = cv::ORB::create();
+        m_pOrb = cv::ORB::create();
     }
     catch(...) {
         std::cout << "Error: with cv::ORB::create() in constructor." << std::endl;
     }
+
+    std::cout << "Setting up thread pool: " << std::endl;
+    try {
+        m_poolSize = poolSize;
+        for(auto i = 0; i < poolSize; ++i)
+        {
+            m_pool.emplace_back(std::thread([=](){ this->processFrame(i); }));
+        }
+    }   
+    catch(...) {
+        std::cout << "Error: creating thread pool in constructor." << std::endl;
+    }
 }
-void FrameProcessor::set_depthScale(float ds) 
+
+void FrameProcessor::processFrame(int threadId)
 {
-    _depthScale = ds;
+    return;
+}
+
+void FrameProcessor::set_depthScale(float depthScale) 
+{
+    m_depthScale = depthScale;
 }
 void FrameProcessor::wrapGoodFeatures(cv::Mat &inputFrame, cv::Mat &depthFrame, cv::Mat &outputFrame) 
 {
@@ -34,10 +52,10 @@ void FrameProcessor::wrapGoodFeatures(cv::Mat &inputFrame, cv::Mat &depthFrame, 
     {
         kps1.emplace_back(cv::KeyPoint(corner, 1.f));
     }
-    _pOrb->compute(inputFrame, kps1, des1);
+    m_pOrb->compute(inputFrame, kps1, des1);
     
     // cv::Mat des1;
-    // this->_pOrb->compute(inputFrame, kps1, des1);
+    // this->m_pOrb->compute(inputFrame, kps1, des1);
     std::cout << "Keypoints Size: " << kps1.size() << std::endl;
 
     //Drawing the features
