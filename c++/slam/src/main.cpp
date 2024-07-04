@@ -24,10 +24,10 @@ using namespace std;
 
 int main()
 {
-    unsigned int n = std::thread::hardware_concurrency();
-    std::cout << n << " concurrent threads supported." << std::endl;
+    unsigned int n_threads = std::thread::hardware_concurrency();
+    std::cout << n_threads << " concurrent threads supported." << std::endl;
     //Testing fp_ptr
-    std::unique_ptr<FrameProcessor> fp_ptr = std::make_unique<FrameProcessor>();
+    std::unique_ptr<FrameProcessor> fp_ptr = std::make_unique<FrameProcessor>(n_threads);
 
 
     try {
