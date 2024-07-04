@@ -67,7 +67,7 @@ int main()
         const auto windowName = "Depth and Color Images";
         cv::namedWindow(windowName, cv::WINDOW_AUTOSIZE);
         cv::Ptr<cv::ORB> m_pOrb = cv::ORB::create();
-        // std::unique_ptr<FrameProcessor> fp_ptr = std::make_unique<FrameProcessor>(n_threads);
+        std::unique_ptr<FrameProcessor> fp_ptr = std::make_unique<FrameProcessor>(n_threads);
         //&& cv::getWindowProperty(windowName, cv::WND_PROP_AUTOSIZE) >= 0
         while(cv::waitKey(1) < 0 && cv::getWindowProperty(windowName, cv::WND_PROP_AUTOSIZE) >= 0)
         {
@@ -92,82 +92,91 @@ int main()
                 last_ts[profile.stream_type()] = ts;
             }
 
-            cv::Mat depthColormap, outputFrame;
-            std::thread colorThread( [&aligned_frames, &outputFrame, m_pOrb]() { 
-                rs2::frame color_frame = aligned_frames.get_color_frame();
-                if(color_frame)
-                {  
-                    cv::Mat color_image(cv::Size(640, 480), CV_8UC3, (void*)color_frame.get_data(), cv::Mat::AUTO_STEP);
-                    cv::Mat grayFrame;
-                    std::vector<cv::Point2f> corners;
-                    color_image.copyTo(outputFrame);
-                    cv::cvtColor(outputFrame, grayFrame, cv::COLOR_BGR2GRAY);
+            rs2::frame color_frame = aligned_frames.get_color_frame();
+            cv::Mat color_image(cv::Size(640, 480), CV_8UC3, (void*)color_frame.get_data(), cv::Mat::AUTO_STEP);
+            cv::Mat depth_image(cv::Size(640, 480), CV_16UC1, (void*)aligned_depth_frame.get_data(), cv::Mat::AUTO_STEP);
+            cv::Mat outputFrame;
+            fp_ptr->wrapGoodFeatures(color_image, outputFrame);
+            cv::Mat depthColormap;
+            depth_image.convertTo(depthColormap, CV_8UC1, 0.03);
+            cv::applyColorMap(depthColormap, depthColormap, cv::COLORMAP_JET);
 
-                    //Parameters should move elswhere
-                    int max_count = 100; 
-                    double quality_level = 0.01; 
-                    double min_distance = 3;
-                    cv::goodFeaturesToTrack(grayFrame, corners, max_count, quality_level, min_distance);
-                    std::cout << "Corners length: " << corners.size() << std::endl;
+            // cv::Mat depthColormap, outputFrame;
+            // std::thread colorThread( [&aligned_frames, &outputFrame, m_pOrb]() { 
+            //     rs2::frame color_frame = aligned_frames.get_color_frame();
+            //     if(color_frame)
+            //     {  
+            //         cv::Mat color_image(cv::Size(640, 480), CV_8UC3, (void*)color_frame.get_data(), cv::Mat::AUTO_STEP);
+            //         cv::Mat grayFrame;
+            //         std::vector<cv::Point2f> corners;
+            //         color_image.copyTo(outputFrame);
+            //         cv::cvtColor(outputFrame, grayFrame, cv::COLOR_BGR2GRAY);
 
-                    std::vector<cv::KeyPoint> kps1;
-                    cv::Mat des1;
-                    for(auto &corner : corners)
-                    {
-                        kps1.emplace_back(cv::KeyPoint(corner, 1.f));
-                    }
-                    m_pOrb->compute(color_image, kps1, des1);
+            //         //Parameters should move elswhere
+            //         int max_count = 100; 
+            //         double quality_level = 0.01; 
+            //         double min_distance = 3;
+            //         cv::goodFeaturesToTrack(grayFrame, corners, max_count, quality_level, min_distance);
+            //         std::cout << "Corners length: " << corners.size() << std::endl;
+
+            //         std::vector<cv::KeyPoint> kps1;
+            //         cv::Mat des1;
+            //         for(auto &corner : corners)
+            //         {
+            //             kps1.emplace_back(cv::KeyPoint(corner, 1.f));
+            //         }
+            //         m_pOrb->compute(color_image, kps1, des1);
                     
-                    // cv::Mat des1;
-                    // this->m_pOrb->compute(color_image, kps1, des1);
-                    std::cout << "Keypoints Size: " << kps1.size() << std::endl;
+            //         // cv::Mat des1;
+            //         // this->m_pOrb->compute(color_image, kps1, des1);
+            //         std::cout << "Keypoints Size: " << kps1.size() << std::endl;
 
-                    //Drawing the features
-                    int radius = 2;
-                    for(auto &corner : corners)
-                    {
-                        cv::circle(outputFrame, corner, radius, cv::Scalar(0, 255, 0));
-                    }
+            //         //Drawing the features
+            //         int radius = 2;
+            //         for(auto &corner : corners)
+            //         {
+            //             cv::circle(outputFrame, corner, radius, cv::Scalar(0, 255, 0));
+            //         }
 
-                }
-            });
-            std::thread depthThread( [&aligned_frames, &depthColormap]() { 
-                rs2::depth_frame aligned_depth_frame = aligned_frames.get_depth_frame();
-                if(aligned_depth_frame)
-                {
-                    // cv::Mat depth_colormap;
-                    cv::Mat depth_image(cv::Size(640, 480), CV_16UC1, (void*)aligned_depth_frame.get_data(), cv::Mat::AUTO_STEP);
-                    depth_image.convertTo(depthColormap, CV_8UC1, 0.03);
-                    cv::applyColorMap(depthColormap, depthColormap, cv::COLORMAP_JET);
-                }
-            });
-            std::thread imuThread( [&aligned_frames, dt]() { 
-                rs2::frame accel_frame = aligned_frames.first(RS2_STREAM_ACCEL, RS2_FORMAT_MOTION_XYZ32F);
-                rs2::motion_frame accel = accel_frame.as<rs2::motion_frame>();
-                rs2::frame gyro_frame = aligned_frames.first(RS2_STREAM_GYRO, RS2_FORMAT_MOTION_XYZ32F);
-                rs2::motion_frame gyro = gyro_frame.as<rs2::motion_frame>();
-                if (accel)
-                {
-                    rs2_vector av = accel.get_motion_data();
-                    float R         = sqrtf(av.x * av.x + av.y * av.y + av.z * av.z);
-                    float newRoll   = acos(av.x / R);
-                    float newYaw    = acos(av.y / R);
-                    float newPitch  = acos(av.z / R);
-                    // std::cout << "accX=" << newRoll << " accY=" << newYaw << " accZ=" << newPitch << std::endl;
-                }
-                if (gyro)
-                {
-                    rs2_vector gv = gyro.get_motion_data();
-                    float gvx   = gv.x;
-                    float gvy   = gv.y;
-                    float gvz   = gv.z;
-                    // std::cout << "gvx=" << gvx << " gvy=" << gvy << " gvz=" << gvz << std::endl;
-                }
-            });
+            //     }
+            // });
+            // std::thread depthThread( [&aligned_frames, &depthColormap]() { 
+            //     rs2::depth_frame aligned_depth_frame = aligned_frames.get_depth_frame();
+            //     if(aligned_depth_frame)
+            //     {
+            //         // cv::Mat depth_colormap;
+            //         cv::Mat depth_image(cv::Size(640, 480), CV_16UC1, (void*)aligned_depth_frame.get_data(), cv::Mat::AUTO_STEP);
+            //         depth_image.convertTo(depthColormap, CV_8UC1, 0.03);
+            //         cv::applyColorMap(depthColormap, depthColormap, cv::COLORMAP_JET);
+            //     }
+            // });
+            // std::thread imuThread( [&aligned_frames, dt]() { 
+            //     rs2::frame accel_frame = aligned_frames.first(RS2_STREAM_ACCEL, RS2_FORMAT_MOTION_XYZ32F);
+            //     rs2::motion_frame accel = accel_frame.as<rs2::motion_frame>();
+            //     rs2::frame gyro_frame = aligned_frames.first(RS2_STREAM_GYRO, RS2_FORMAT_MOTION_XYZ32F);
+            //     rs2::motion_frame gyro = gyro_frame.as<rs2::motion_frame>();
+            //     if (accel)
+            //     {
+            //         rs2_vector av = accel.get_motion_data();
+            //         float R         = sqrtf(av.x * av.x + av.y * av.y + av.z * av.z);
+            //         float newRoll   = acos(av.x / R);
+            //         float newYaw    = acos(av.y / R);
+            //         float newPitch  = acos(av.z / R);
+            //         // std::cout << "accX=" << newRoll << " accY=" << newYaw << " accZ=" << newPitch << std::endl;
+            //     }
+            //     if (gyro)
+            //     {
+            //         rs2_vector gv = gyro.get_motion_data();
+            //         float gvx   = gv.x;
+            //         float gvy   = gv.y;
+            //         float gvz   = gv.z;
+            //         // std::cout << "gvx=" << gvx << " gvy=" << gvy << " gvz=" << gvz << std::endl;
+            //     }
+            // });
 
-            colorThread.join();
-            depthThread.join();
-            imuThread.join();
+            // colorThread.join();
+            // depthThread.join();
+            // imuThread.join();
             auto end = std::chrono::high_resolution_clock::now();
             std::chrono::duration<double, std::milli> duration = end - start;
 
