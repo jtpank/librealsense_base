@@ -6,6 +6,7 @@
 #include "FrameProcessor.hpp"
 #include "FrameBuffer.hpp"
 #include <memory>
+#include <thread>
 #include <cstdio>
 
 using namespace std;
@@ -23,6 +24,8 @@ using namespace std;
 
 int main()
 {
+    unsigned int n = std::thread::hardware_concurrency();
+    std::cout << n << " concurrent threads supported." << std::endl;
     //Testing fp_ptr
     std::unique_ptr<FrameProcessor> fp_ptr = std::make_unique<FrameProcessor>();
 

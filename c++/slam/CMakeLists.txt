@@ -18,7 +18,7 @@ if(${CMAKE_SYSTEM_PROCESSOR} STREQUAL "aarch64")
     find_package(realsense2 REQUIRED)
     target_include_directories(slam PRIVATE ${OpenCV_INCLUDE_DIRS})
     target_include_directories(slam PRIVATE ${INCLUDE_DIRS})
-    target_link_libraries(slam ${OpenCV_LIBS} realsense2)
+    target_link_libraries(slam ${OpenCV_LIBS} realsense2 pthread)
 endif()
 
 if(${CMAKE_SYSTEM_PROCESSOR} STREQUAL "x86_64")
