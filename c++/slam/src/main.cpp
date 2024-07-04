@@ -65,7 +65,8 @@ int main()
         cv::namedWindow(depth_window_name, cv::WINDOW_AUTOSIZE);
 
         std::unique_ptr<FrameProcessor> fp_ptr = std::make_unique<FrameProcessor>(n_threads);
-        while(cv::waitKey(1) < 0 && cv::getWindowProperty(window_name, cv::WND_PROP_AUTOSIZE) >= 0)
+        //&& cv::getWindowProperty(window_name, cv::WND_PROP_AUTOSIZE) >= 0
+        while(cv::waitKey(1) < 0)
         {
             // Camera warmup - dropping several first frames to let auto-exposure stabilize
             rs2::frameset frames, aligned_frames;
