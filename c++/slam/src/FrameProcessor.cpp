@@ -11,15 +11,17 @@ FrameProcessor::FrameProcessor(unsigned int poolSize)
     }
 
     std::cout << "Setting up thread pool: " << std::endl;
-    try {
-        m_poolSize = poolSize;
-        for(auto i = 0; i < poolSize; ++i)
-        {
-            // m_pool.emplace_back(std::thread([=](){ this->processFrame(i); }));
+    m_poolSize = poolSize;
+    for(auto i = 0; i < poolSize; ++i)
+    {
+        //this leads to terminate called without an active exception
+        // Aborted (core dumped)
+        try {
+             m_pool.emplace_back(std::thread([=](){ this->processFrame(i); }));
+        } catch (const std::exception& e) {
+            std::cerr << "Exception during thread creation: " << e.what() << std::endl;
+            throw;
         }
-    }   
-    catch(...) {
-        std::cout << "Error: creating thread pool in constructor." << std::endl;
     }
 }
 
