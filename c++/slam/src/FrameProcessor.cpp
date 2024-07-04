@@ -22,8 +22,52 @@ void FrameProcessor::frameConsumer(int threadId)
     while(true)
     {
         try{
+            rs2::frameset aligned_frames = m_frameBuffer.pop();
+            //From: https://github.com/GruffyPuffy/imutest/blob/master/imutest.cpp
+            for (auto f : aligned_frames)
+            {
+                rs2::stream_profile profile = f.get_profile();
 
-            std::cout << "thread number: " << threadId << std::endl;
+                unsigned long fnum = f.get_frame_number();
+                double ts = f.get_timestamp();
+                dt[profile.stream_type()] = (ts - last_ts[profile.stream_type()] ) / 1000.0;
+                last_ts[profile.stream_type()] = ts;
+
+                std::cout << " threadId: " << threadId << " [ " << profile.stream_name() << " fnum: " << fnum << " dt: " << dt[profile.stream_type()] << "] \n";
+            }
+            
+            //Get the frames
+            rs2::frame color_frame = aligned_frames.get_color_frame();
+            rs2::depth_frame aligned_depth_frame = aligned_frames.get_depth_frame();
+            rs2::frame accel_frame = aligned_frames.first(RS2_STREAM_ACCEL, RS2_FORMAT_MOTION_XYZ32F);
+            rs2::motion_frame accel = accel_frame.as<rs2::motion_frame>();
+            rs2::frame gyro_frame = aligned_frames.first(RS2_STREAM_GYRO, RS2_FORMAT_MOTION_XYZ32F);
+            rs2::motion_frame gyro = gyro_frame.as<rs2::motion_frame>();
+            //helper function: auto depth_mat = depth_frame_to_meters(pipe, depth_frame);
+            // printf("frames length: %li, aligned_frames length: %li\n", frames.size(), aligned_frames.size());
+
+            if (!aligned_depth_frame  || !color_frame) 
+            {
+                continue;
+            }
+
+            if (accel)
+            {
+                rs2_vector av = accel.get_motion_data();
+                float R = sqrtf(av.x * av.x + av.y * av.y + av.z * av.z);
+                float newRoll = acos(av.x / R);
+                float newYaw = acos(av.y / R);
+                float newPitch = acos(av.z / R);
+                std::cout << "accX=" << newRoll << " accY=" << newYaw << " accZ=" << newPitch << std::endl;
+            }
+            if (gyro)
+            {
+                rs2_vector gv = gyro.get_motion_data();
+                float gvx   = gv.x;
+                float gvy    = gv.y;
+                float gvz  = gv.z;
+                std::cout << "gvx=" << gvx << " gvy=" << gvy << " gvz=" << gvz << std::endl;
+            }
         }
         catch(const std::runtime_error &e){
         }
