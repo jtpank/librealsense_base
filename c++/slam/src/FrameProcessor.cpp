@@ -9,6 +9,13 @@ FrameProcessor::FrameProcessor(unsigned int poolSize)
     catch(...) {
         std::cout << "Error: with cv::ORB::create() in constructor." << std::endl;
     }
+    std::cout << "Constructing FrameBuffer: " << std::endl;
+    try {
+        m_frameBuffer(poolSize);
+    }
+    catch(...) {
+        std::cout << "Error: constructing FrameBuffer." << std::endl;
+    }
 
     std::cout << "Setting up thread pool: " << std::endl;
     m_poolSize = poolSize;

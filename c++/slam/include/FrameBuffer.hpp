@@ -8,12 +8,12 @@ template <typename T>
 class FrameBuffer
 {
     private:
-        const unsigned int m_size;
+        unsigned int m_size;
         std::mutex m_mutex;
         std::condition_variable m_cv;
         std::deque<T> m_buffer;
     public:
-        FrameBuffer(const unsigned int sz): m_size(sz) {}
+        FrameBuffer(unsigned int sz): m_size(sz) {}
         void push(T data) {
             std::unique_lock<std::mutex> u_lock(m_mutex);
             m_cv.wait(u_lock, [this]() { return m_buffer.size() < m_size;});
