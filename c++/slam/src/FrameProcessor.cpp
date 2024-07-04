@@ -17,7 +17,7 @@ FrameProcessor::FrameProcessor(unsigned int poolSize)
         //this leads to terminate called without an active exception
         // Aborted (core dumped)
         try {
-             m_pool.emplace_back(std::thread([=](){ processFrame(i); }));
+             m_pool.emplace_back(std::thread([=](){ this->processFrame(i); }));
         } catch (const std::exception& e) {
             std::cerr << "Exception during thread creation: " << e.what() << std::endl;
             throw;

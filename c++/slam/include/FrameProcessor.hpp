@@ -1,6 +1,7 @@
 #pragma once
 #include <opencv2/opencv.hpp>
 #include <opencv2/features2d.hpp>
+#include "FrameBuffer.hpp"
 #include <iostream>
 #include <thread>
 #include <vector>
@@ -14,6 +15,7 @@ class FrameProcessor
         float m_depthScale;
         unsigned int m_poolSize;
         std::vector<std::thread> m_pool;
+        FrameBuffer<int> m_frameBuffer;
 
     public:
         FrameProcessor(unsigned int poolSize);
