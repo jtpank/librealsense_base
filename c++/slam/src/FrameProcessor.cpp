@@ -15,7 +15,7 @@ FrameProcessor::FrameProcessor(unsigned int poolSize)
         m_poolSize = poolSize;
         for(auto i = 0; i < poolSize; ++i)
         {
-            m_pool.emplace_back(std::thread([=](){ this->processFrame(i); }));
+            // m_pool.emplace_back(std::thread([=](){ this->processFrame(i); }));
         }
     }   
     catch(...) {
