@@ -84,7 +84,7 @@ void FrameProcessor::set_depthScale(float depthScale)
 {
     m_depthScale = depthScale;
 }
-void FrameProcessor::wrapGoodFeatures(cv::Mat &inputFrame, cv::Mat &depthFrame, cv::Mat &outputFrame) 
+void FrameProcessor::wrapGoodFeatures(cv::Mat &inputFrame, cv::Mat &outputFrame) 
 {
     cv::Mat grayFrame;
     std::vector<cv::Point2f> corners;
@@ -123,9 +123,9 @@ void FrameProcessor::test_wrapGoodFeatures()
 {   
     //TODO: this returns a cv::Exception if not called from the directory with the image
     cv::Mat inputFrame = cv::imread("./test-image.png", cv::IMREAD_COLOR);
-    cv::Mat depthFrame, outputFrame;
+    cv::Mat outputFrame;
 
-    wrapGoodFeatures(inputFrame, depthFrame, outputFrame);
+    wrapGoodFeatures(inputFrame, outputFrame);
     const auto goodFeatsWindow = "Good Features Image"; 
     cv::namedWindow(goodFeatsWindow, cv::WINDOW_AUTOSIZE);
 

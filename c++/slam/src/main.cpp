@@ -84,7 +84,8 @@ int main()
             rs2::frame color_frame = aligned_frames.get_color_frame();
             cv::Mat color_image(cv::Size(640, 480), CV_8UC3, (void*)color_frame.get_data(), cv::Mat::AUTO_STEP);
             // cv::Mat depth_image(cv::Size(640, 480), CV_16UC1, (void*)aligned_depth_frame.get_data(), cv::Mat::AUTO_STEP);
-
+            cv::Mat output_frame;
+            fp_ptr->wrapGoodFeatures(color_image, output_frame);
             // cv::Mat depth_colormap;
             // depth_image.convertTo(depth_colormap, CV_8UC1, 0.03);
             // cv::applyColorMap(depth_colormap, depth_colormap, cv::COLORMAP_JET);
@@ -93,7 +94,7 @@ int main()
             // cv::Mat both_images;
             // cv::hconcat(color_image, depth_colormap, both_images);
 
-            cv::imshow(window_name, color_image);
+            cv::imshow(window_name, output_frame);
         }
     }
     catch (const rs2::error & e)

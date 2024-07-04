@@ -23,6 +23,6 @@ class FrameProcessor
         void frameConsumer(int threadId);
         void processFrameset(rs2::frameset& frameSet);
         void set_depthScale(float depthScale);
-        void wrapGoodFeatures(cv::Mat &inputFrame, cv::Mat &depthFrame, cv::Mat &outputFrame);
+        void wrapGoodFeatures(cv::Mat &inputFrame, cv::Mat &outputFrame);
         void test_wrapGoodFeatures();
 };
