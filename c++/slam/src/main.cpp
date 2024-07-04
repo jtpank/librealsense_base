@@ -93,6 +93,11 @@ int main()
             }
 
             rs2::frame color_frame = aligned_frames.get_color_frame();
+            rs2::depth_frame aligned_depth_frame = aligned_frames.get_depth_frame();
+            rs2::frame accel_frame = aligned_frames.first(RS2_STREAM_ACCEL, RS2_FORMAT_MOTION_XYZ32F);
+            rs2::motion_frame accel = accel_frame.as<rs2::motion_frame>();
+            rs2::frame gyro_frame = aligned_frames.first(RS2_STREAM_GYRO, RS2_FORMAT_MOTION_XYZ32F);
+            rs2::motion_frame gyro = gyro_frame.as<rs2::motion_frame>();
             cv::Mat color_image(cv::Size(640, 480), CV_8UC3, (void*)color_frame.get_data(), cv::Mat::AUTO_STEP);
             cv::Mat depth_image(cv::Size(640, 480), CV_16UC1, (void*)aligned_depth_frame.get_data(), cv::Mat::AUTO_STEP);
             cv::Mat outputFrame;
