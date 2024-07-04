@@ -33,7 +33,7 @@ void FrameProcessor::frameConsumer(int threadId)
                 // dt[profile.stream_type()] = (ts - last_ts[profile.stream_type()] ) / 1000.0;
                 // last_ts[profile.stream_type()] = ts;
 
-                std::cout << " threadId: " << threadId << " [ " << profile.stream_name() << " fnum: " << fnum << " ts: " << ts << "]\n";
+                // std::cout << " threadId: " << threadId << " [ " << profile.stream_name() << " fnum: " << fnum << " ts: " << ts << "]\n";
                 //" dt: " << dt[profile.stream_type()] << "] \n";
             }
             
@@ -59,7 +59,7 @@ void FrameProcessor::frameConsumer(int threadId)
                 float newRoll = acos(av.x / R);
                 float newYaw = acos(av.y / R);
                 float newPitch = acos(av.z / R);
-                std::cout << "accX=" << newRoll << " accY=" << newYaw << " accZ=" << newPitch << std::endl;
+                // std::cout << "accX=" << newRoll << " accY=" << newYaw << " accZ=" << newPitch << std::endl;
             }
             if (gyro)
             {
@@ -67,7 +67,7 @@ void FrameProcessor::frameConsumer(int threadId)
                 float gvx   = gv.x;
                 float gvy    = gv.y;
                 float gvz  = gv.z;
-                std::cout << "gvx=" << gvx << " gvy=" << gvy << " gvz=" << gvz << std::endl;
+                // std::cout << "gvx=" << gvx << " gvy=" << gvy << " gvz=" << gvz << std::endl;
             }
         }
         catch(const std::runtime_error &e){
