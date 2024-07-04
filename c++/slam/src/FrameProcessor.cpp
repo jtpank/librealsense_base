@@ -2,14 +2,14 @@
 
 FrameProcessor::FrameProcessor(unsigned int poolSize) : m_pOrb(cv::ORB::create()), m_poolSize(poolSize), m_frameBuffer(poolSize)
 {   
-    std::cout << "Setting up thread pool: " << std::endl;
+    std::cout << "\nSetting up thread pool: " << std::endl;
     m_poolSize = poolSize;
     for(auto i = 0; i < poolSize; ++i)
     {
         //this leads to terminate called without an active exception
         // Aborted (core dumped)
         try {
-             m_pool.emplace_back(std::thread([=](){ this->processFrame(i); }));
+             m_pool.emplace_back(std::thread( [=]() { processFrame(i); }));
         } catch (const std::exception& e) {
             std::cerr << "Exception during thread creation: " << e.what() << std::endl;
             throw;
