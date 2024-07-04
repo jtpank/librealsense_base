@@ -22,7 +22,7 @@ void FrameProcessor::frameConsumer(int threadId)
     while(true)
     {
         try{
-            
+
             std::cout << "thread number: " << threadId << std::endl;
         }
         catch(const std::runtime_error &e){
@@ -32,7 +32,7 @@ void FrameProcessor::frameConsumer(int threadId)
 
 void FrameProcessor::processFrameset(rs2::frameset& frameSet)
 {
-    m_frameBuffer.add(frameSet);
+    m_frameBuffer.push(frameSet);
 }
 
 void FrameProcessor::set_depthScale(float depthScale) 
