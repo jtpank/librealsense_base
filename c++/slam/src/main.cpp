@@ -4,8 +4,10 @@
 #include <opencv2/features2d.hpp>
 #include <librealsense2/rs.hpp> // Include RealSense Cross Platform API
 #include "FrameProcessor.hpp"
+#include "FrameBuffer.hpp"
 #include <memory>
 #include <cstdio>
+
 using namespace std;
 
 

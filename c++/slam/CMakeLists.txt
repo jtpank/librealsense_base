@@ -31,7 +31,7 @@ if(${CMAKE_SYSTEM_PROCESSOR} STREQUAL "x86_64")
     find_package( OpenCV REQUIRED )
     target_include_directories(slam PRIVATE ${OpenCV_INCLUDE_DIRS})
     target_include_directories(slam PRIVATE ${INCLUDE_DIRS})
-    target_link_libraries( slam ${OpenCV_LIBS} realsense2 )
+    target_link_libraries( slam ${OpenCV_LIBS} realsense2 pthread)
 endif()
 
 #OpenGL
