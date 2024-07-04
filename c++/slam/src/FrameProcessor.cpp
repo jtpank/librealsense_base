@@ -38,7 +38,7 @@ void FrameProcessor::frameConsumer(int threadId)
             }
             
             //Get the frames
-            rs2::frame color_frame = aligned_frames.get_color_frame();
+            // rs2::frame color_frame = aligned_frames.get_color_frame();
             rs2::depth_frame aligned_depth_frame = aligned_frames.get_depth_frame();
             rs2::frame accel_frame = aligned_frames.first(RS2_STREAM_ACCEL, RS2_FORMAT_MOTION_XYZ32F);
             rs2::motion_frame accel = accel_frame.as<rs2::motion_frame>();
@@ -47,7 +47,7 @@ void FrameProcessor::frameConsumer(int threadId)
             //helper function: auto depth_mat = depth_frame_to_meters(pipe, depth_frame);
             // printf("frames length: %li, aligned_frames length: %li\n", frames.size(), aligned_frames.size());
 
-            if (!aligned_depth_frame  || !color_frame) 
+            if (!aligned_depth_frame ) // || !color_frame) 
             {
                 continue;
             }
