@@ -64,8 +64,8 @@ int main()
         // const auto depth_window_name = "Depth Image";
         // cv::namedWindow(color_window_name, cv::WINDOW_AUTOSIZE);
         // cv::namedWindow(depth_window_name, cv::WINDOW_AUTOSIZE);
-        // const auto windowName = "Depth and Color Images";
-        // cv::namedWindow(windowName, cv::WINDOW_AUTOSIZE);
+        const auto windowName = "Depth and Color Images";
+        cv::namedWindow(windowName, cv::WINDOW_AUTOSIZE);
         std::unique_ptr<FrameProcessor> fp_ptr = std::make_unique<FrameProcessor>(n_threads);
         //&& cv::getWindowProperty(windowName, cv::WND_PROP_AUTOSIZE) >= 0
         while(cv::waitKey(1) < 0 && cv::getWindowProperty(windowName, cv::WND_PROP_AUTOSIZE) >= 0)
