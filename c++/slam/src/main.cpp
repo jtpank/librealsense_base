@@ -214,7 +214,7 @@ int main()
             // // cv::Mat both_images;
             // // cv::hconcat(color_image, depth_colormap, both_images);
 
-            cv::imshow(window_name, color_image);
+            cv::imshow(windowName, color_image);
         }
     }
     catch (const rs2::error & e)
