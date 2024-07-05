@@ -103,12 +103,12 @@ int main()
             rs2::motion_frame gyro = gyro_frame.as<rs2::motion_frame>();
             double gyro_ts = gyro.get_timestamp();
 
-            // rs2::frame color_frame = aligned_frames.get_color_frame();
-            // rs2::depth_frame aligned_depth_frame = aligned_frames.get_depth_frame();
-            // cv::Mat color_image(cv::Size(640, 480), CV_8UC3, (void*)color_frame.get_data(), cv::Mat::AUTO_STEP);
-            // cv::Mat depth_image(cv::Size(640, 480), CV_16UC1, (void*)aligned_depth_frame.get_data(), cv::Mat::AUTO_STEP);
-            // cv::Mat output_frame;
-            // fp_ptr->wrapGoodFeatures(color_image, output_frame);
+            rs2::frame color_frame = aligned_frames.get_color_frame();
+            rs2::depth_frame aligned_depth_frame = aligned_frames.get_depth_frame();
+            cv::Mat color_image(cv::Size(640, 480), CV_8UC3, (void*)color_frame.get_data(), cv::Mat::AUTO_STEP);
+            cv::Mat depth_image(cv::Size(640, 480), CV_16UC1, (void*)aligned_depth_frame.get_data(), cv::Mat::AUTO_STEP);
+            cv::Mat output_frame;
+            fp_ptr->wrapGoodFeatures(color_image, output_frame);
             
             if (gyro)
             {
@@ -129,10 +129,9 @@ int main()
             duration = end - new_start;
             std::chrono::duration<double, std::milli> duration_final = end - start;
             // std::cout << "Process Frames: Elapsed time: " << duration.count() << " ms " << std::endl;
-            // std::cout << "Total Elapsed time: " << duration_final.count() << " ms " << std::endl;
+            std::cout << "Total Elapsed time: " << duration_final.count() << " ms " << std::endl;
             
-            // std::cout << "accelX=" << accelX*180.0/M_PI << " accelY=" << accelY*180.0/M_PI << " accelZ=" << accelZ*180.0/M_PI << std::endl;
-
+          
 
         }
     }
