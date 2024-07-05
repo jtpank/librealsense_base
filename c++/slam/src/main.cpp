@@ -5,6 +5,7 @@
 #include <librealsense2/rs.hpp> // Include RealSense Cross Platform API
 #include "FrameProcessor.hpp"
 #include "FrameBuffer.hpp"
+#include "RotationEstimator.hpp"
 #include <memory>
 #include <thread>
 #include <cstdio>
@@ -12,6 +13,15 @@
 
 using namespace std;
 #define CAPACITY 8
+
+
+//If camera is facing out on a level surface
+// normalized_accel = (0, -1, 0)
+// If facing camera:
+// +x is to my left
+// +y is to my up
+// +z is into the camer
+
 
 int main()
 {
@@ -52,12 +62,9 @@ int main()
         bool firstAccel = true;
         double last_ts[RS2_STREAM_COUNT];
         double dt[RS2_STREAM_COUNT];
-        float roll = 0.0;
-        float pitch = 0.0;
-        float yaw = 0.0;
 
         std::unique_ptr<FrameProcessor> fp_ptr = std::make_unique<FrameProcessor>(n_threads);
-
+        RotationEstimator algo;
         // while(cv::waitKey(1) < 0 && cv::getWindowProperty(windowName, cv::WND_PROP_AUTOSIZE) >= 0)
         while(true)
         {
@@ -107,42 +114,15 @@ int main()
             if (accel)
             {
                 rs2_vector av = accel.get_motion_data();
-                float R         = sqrtf(av.x * av.x + av.y * av.y + av.z * av.z);
-                float newRoll   = acos(av.x / R);
-                float newYaw    = acos(av.y / R);
-                float newPitch  = acos(av.z / R);
-                if (firstAccel)
-                {
-                    firstAccel = false;
-                    roll = newRoll;
-                    yaw = newYaw;
-                    pitch = newPitch;
-                }
-                else
-                {
-                    // Compensate GYRO-drift with ACCEL
-                    roll = roll * 0.98 + newRoll * 0.02;
-                    yaw = yaw * 0.98 + newYaw * 0.02;
-                    pitch = pitch * 0.98 + newPitch * 0.02;
-                }
-                std::cout << "av.x=" << av.x << " av.y=" << av.y << " av.z=" << av.z << std::endl;
+                algo.process_accel(av);
             }
             if (gyro)
             {
                 rs2_vector gv = gyro.get_motion_data();
-                double ratePitch    = gv.x;
-                double rateYaw      = gv.y;
-                double rateRoll     = gv.z;
-                ratePitch           *= dt[RS2_STREAM_GYRO];
-                rateYaw             *= dt[RS2_STREAM_GYRO];
-                rateRoll            *= dt[RS2_STREAM_GYRO];
-                // ROLL - Around "blue" (forward), poisitive => right
-                roll += rateRoll;
-                // PITCH - Around "red" (right), positve => right
-                pitch -= ratePitch; 
-                // YAW - Around "green" (down), positive => right
-                yaw += rateYaw;
+                algo.process_gyro(gv, dt[RS2_STREAM_GYRO]);
             }
+
+            std::cout << "Roll: " << (algo.get_theta()).x << " Pitch: " << (algo.get_theta()).y << " Yaw: " < (algo.get_theta()).z << std::endl;
 
 
             // Output the duration in milliseconds
