@@ -40,11 +40,6 @@ int main()
         cfg.enable_stream(RS2_STREAM_COLOR, 640, 480, RS2_FORMAT_BGR8, 30);
         cfg.enable_stream(RS2_STREAM_DEPTH, 640, 480, RS2_FORMAT_Z16, 30);
 
-        bool firstAccel = true;
-        double last_ts[RS2_STREAM_COUNT];
-        double dt[RS2_STREAM_COUNT];
-
-
         //Instruct pipeline to start streaming with the requested configuration
         rs2::pipeline_profile pipeline_profile = pipe.start(cfg);
         
@@ -53,6 +48,14 @@ int main()
         //Display time
         // const auto windowName = "Depth and Color Images";
         // cv::namedWindow(windowName, cv::WINDOW_AUTOSIZE);
+
+        //For gyro and accel pose
+        bool firstAccel = true;
+        double last_ts[RS2_STREAM_COUNT];
+        double dt[RS2_STREAM_COUNT];
+        float roll = 0.0;
+        float pitch = 0.0;
+        float yaw = 0.0;
 
         std::unique_ptr<FrameProcessor> fp_ptr = std::make_unique<FrameProcessor>(n_threads);
 
@@ -108,15 +111,36 @@ int main()
                 float newRoll   = acos(av.x / R);
                 float newYaw    = acos(av.y / R);
                 float newPitch  = acos(av.z / R);
-                // std::cout << "accX=" << newRoll << " accY=" << newYaw << " accZ=" << newPitch << std::endl;
+                if (firstAccel)
+                {
+                    firstAccel = false;
+                    roll = newRoll;
+                    yaw = newYaw;
+                    pitch = newPitch;
+                }
+                else
+                {
+                    // Compensate GYRO-drift with ACCEL
+                    roll = roll * 0.98 + newRoll * 0.02;
+                    yaw = yaw * 0.98 + newYaw * 0.02;
+                    pitch = pitch * 0.98 + newPitch * 0.02;
+                }
             }
             if (gyro)
             {
                 rs2_vector gv = gyro.get_motion_data();
-                float gvx   = gv.x;
-                float gvy   = gv.y;
-                float gvz   = gv.z;
-                // std::cout << "gvx=" << gvx << " gvy=" << gvy << " gvz=" << gvz << std::endl;
+                double ratePitch    = gv.x;
+                double rateYaw      = gv.y;
+                double rateRoll     = gv.z;
+                ratePitch           *= dt[RS2_STREAM_GYRO];
+                rateYaw             *= dt[RS2_STREAM_GYRO];
+                rateRoll            *= dt[RS2_STREAM_GYRO];
+                // ROLL - Around "blue" (forward), poisitive => right
+                roll += rateRoll;
+                // PITCH - Around "red" (right), positve => right
+                pitch -= ratePitch; 
+                // YAW - Around "green" (down), positive => right
+                yaw += rateYaw;
             }
 
 
@@ -126,7 +150,8 @@ int main()
             std::chrono::duration<double, std::milli> duration_final = end - start;
             std::cout << "Process Frames: Elapsed time: " << duration.count() << " ms " << std::endl;
             std::cout << "Total Elapsed time: " << duration_final.count() << " ms " << std::endl;
-        
+            std::cout << "Roll: " << roll << " Pitch: " << pitch << " Yaw: " << yaw << std::endl;
+
 
         }
     }
