@@ -1,6 +1,8 @@
 #include "FrameProcessor.hpp"
 
-FrameProcessor::FrameProcessor(unsigned int poolSize) : m_pOrb(cv::ORB::create()), m_poolSize(poolSize), m_frameBuffer(poolSize)
+FrameProcessor::FrameProcessor(unsigned int poolSize) 
+: m_pOrb(cv::ORB::create()), m_bfMatcher(cv::BFMatcher::create(cv::NORM_HAMMING)), 
+m_poolSize(poolSize), m_frameBuffer(poolSize), m_hasFirstFrame(false)
 {   
     std::cout << "\nSetting up thread pool: " << std::endl;
     m_poolSize = poolSize;
@@ -136,4 +138,28 @@ void FrameProcessor::orbDetectAndCompute(cv::Mat &inputFrame, cv::Mat &outputFra
     m_pOrb->detectAndCompute(grayFrame, mask, kps, des);
     cv::drawKeypoints(inputFrame, kps, outputFrame, cv::Scalar::all(-1), cv::DrawMatchesFlags::DEFAULT);
 
+    m_kps.push_back(kps);
+    m_des.push_back(des);
+
+    //have our first frame now
+    if(!m_hasFirstFrame)
+    {
+        m_hasFirstFrame = true;
+    }
+    
+}
+
+void FrameProcessor::bfMatchFrames()
+{
+    //knn match
+    if(m_hasFirstFrame)
+    {
+        std::vector<std::vector<cv::DMatch>> matches;
+        m_bfMatcher->knnMatch(m_des.front(), m_des.back(), matches, 2);
+
+        //so we only have 2
+        m_des.pop_front();
+        m_kps.pop_front();
+        std::cout << "matching!\n";
+    }
 }

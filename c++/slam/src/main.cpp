@@ -123,6 +123,7 @@ int main()
             cv::Mat output_frame;
             // fp_ptr->wrapGoodFeatures(color_image, output_frame);
             fp_ptr->orbDetectAndCompute(color_image, output_frame);
+            fp_ptr->bfMatchFrames();
             cv::imshow(windowName, output_frame);
             // Output the duration in milliseconds
             end = std::chrono::high_resolution_clock::now();
