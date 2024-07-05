@@ -122,7 +122,7 @@ int main()
                 algo.process_gyro(gv, dt[RS2_STREAM_GYRO]);
             }
 
-            std::cout << "Roll: " << (algo.get_theta()).x << " Pitch: " << (algo.get_theta()).y << " Yaw: " < (algo.get_theta()).z << std::endl;
+            std::cout << "Roll: " << (algo.get_theta()).x << " Pitch: " << (algo.get_theta()).y << " Yaw: " << (algo.get_theta()).z << std::endl;
 
 
             // Output the duration in milliseconds
