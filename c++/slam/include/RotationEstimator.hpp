@@ -1,11 +1,12 @@
 #pragma once
 #include <librealsense2/rs.hpp>
 #include <mutex>
-
+#include "float3.hpp"
+ 
 class RotationEstimator
 {
     // theta is the angle of camera rotation in x, y and z components
-    rs2::float3 theta;
+    float3 theta;
     std::mutex theta_mtx;
     /* alpha indicates the part that gyro and accelerometer take in computation of theta; higher alpha gives more weight to gyro, but too high
     values cause drift; lower alpha gives more weight to accelerometer, which is more sensitive to disturbances */
@@ -25,7 +26,7 @@ public:
             return;
         }
         // Holds the change in angle, as calculated from gyro
-        rs2::float3 gyro_angle;
+        float3 gyro_angle;
 
         // Initialize gyro_angle with data from gyro
         gyro_angle.x = gyro_data.x; // Pitch
@@ -47,7 +48,7 @@ public:
     void process_accel(rs2_vector accel_data)
     {
         // Holds the angle as calculated from accelerometer data
-        rs2::float3 accel_angle;
+        float3 accel_angle;
 
         // Calculate rotation angle from accelerometer data
         accel_angle.z = atan2(accel_data.y, accel_data.z);
@@ -76,7 +77,7 @@ public:
     }
     
     // Returns the current rotation angle
-    rs2::float3 get_theta()
+    float3 get_theta()
     {
         std::lock_guard<std::mutex> lock(theta_mtx);
         return theta;

@@ -10,7 +10,7 @@
 #include <thread>
 #include <cstdio>
 #include <chrono>
-
+#include "float3.hpp"
 using namespace std;
 #define CAPACITY 8
 
