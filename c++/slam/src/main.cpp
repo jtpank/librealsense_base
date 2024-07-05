@@ -12,7 +12,6 @@
 
 using namespace std;
 #define CAPACITY 8
-#define M_PI 3.14159265f
 
 int main()
 {
@@ -151,7 +150,7 @@ int main()
             // std::cout << "Process Frames: Elapsed time: " << duration.count() << " ms " << std::endl;
             // std::cout << "Total Elapsed time: " << duration_final.count() << " ms " << std::endl;
             std::cout << "roll=" << roll*180.0/M_PI << " pitch=" << pitch*180.0/M_PI << " yaw=" << yaw*180.0/M_PI << std::endl;
-            std::cout << "accelX=" << accelX*180.0/M_PI << " accelY=" << accelY*180.0/M_PI << " accelZ=" << accelZ*180.0/M_PI << std::endl;
+            // std::cout << "accelX=" << accelX*180.0/M_PI << " accelY=" << accelY*180.0/M_PI << " accelZ=" << accelZ*180.0/M_PI << std::endl;
 
 
         }
