@@ -59,7 +59,6 @@ int main()
         // cv::namedWindow(windowName, cv::WINDOW_AUTOSIZE);
 
         //For gyro and accel pose
-        bool firstAccel = true;
         double last_ts[RS2_STREAM_COUNT];
         double dt[RS2_STREAM_COUNT];
 
