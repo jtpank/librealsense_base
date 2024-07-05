@@ -157,6 +157,16 @@ void FrameProcessor::bfMatchFrames()
         m_des.pop_front();
         m_kps.pop_front();
         std::cout << "matching!\n";
+
+        std::vector<cv::DMatch> good_matches;
+        if(matches.size() >= 2)
+        {
+            for(auto &match : matches)
+            {
+                if(match[0].distance < 0.75f * match[1].distance)
+                    good_matches.emplace_back(match[0]);
+            }
+        }
     }
     else
     {
