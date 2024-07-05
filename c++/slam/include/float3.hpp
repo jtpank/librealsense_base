@@ -11,3 +11,21 @@ struct float3
         return (length() > 0)? float3{ x / length(), y / length(), z / length() }:*this;
     }
 };
+inline float3 operator*(const float3& a, float t)
+{
+    return { a.x * t, a.y * t, a.z * t };
+}
+inline float3 operator/(const float3& a, float t)
+{
+    return { a.x / t, a.y / t, a.z / t };
+}
+
+inline float3 operator+(const float3& a, const float3& b)
+{
+    return { a.x + b.x, a.y + b.y, a.z + b.z };
+}
+
+inline float3 operator-(const float3& a, const float3& b)
+{
+    return { a.x - b.x, a.y - b.y, a.z - b.z };
+}
