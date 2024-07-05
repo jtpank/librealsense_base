@@ -10,6 +10,13 @@ struct float3
     {
         return (length() > 0)? float3{ x / length(), y / length(), z / length() }:*this;
     }
+
+    void add(float inX, float inY, float inZ)
+    {
+        x += inX;
+        y += inY;
+        z += inZ;
+    }
 };
 inline float3 operator*(const float3& a, float t)
 {
