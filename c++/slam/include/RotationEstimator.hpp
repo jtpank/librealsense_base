@@ -14,15 +14,15 @@ class RotationEstimator
     bool firstGyro = true;
     bool firstAccel = true;
     // Keeps the arrival time of previous gyro frame
-    // double last_ts_gyro = 0;
+    double last_ts_gyro = 0;
 public:
     // Function to calculate the change in angle of motion based on data from gyro
-    void process_gyro(rs2_vector gyro_data, double dt_gyro)
+    void process_gyro(rs2_vector gyro_data, double ts)
     {
         if (firstGyro) // On the first iteration, use only data from accelerometer to set the camera's initial position
         {
             firstGyro = false;
-            // last_ts_gyro = ts;
+            last_ts_gyro = ts;
             return;
         }
         // Holds the change in angle, as calculated from gyro
@@ -34,8 +34,8 @@ public:
         gyro_angle.z = gyro_data.z; // Roll
 
         // Compute the difference between arrival times of previous and current gyro frames
-        // double dt_gyro = (ts - last_ts_gyro) / 1000.0;
-        // last_ts_gyro = ts;
+        double dt_gyro = (ts - last_ts_gyro) / 1000.0;
+        last_ts_gyro = ts;
 
         // Change in angle equals gyro measures * time passed since last measurement
         gyro_angle = gyro_angle * static_cast<float>(dt_gyro);
