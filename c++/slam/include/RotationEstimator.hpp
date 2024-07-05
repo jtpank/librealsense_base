@@ -22,7 +22,7 @@ public:
         if (firstGyro) // On the first iteration, use only data from accelerometer to set the camera's initial position
         {
             firstGyro = false;
-            last_ts_gyro = ts;
+            // last_ts_gyro = ts;
             return;
         }
         // Holds the change in angle, as calculated from gyro
