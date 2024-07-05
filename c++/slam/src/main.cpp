@@ -55,16 +55,16 @@ int main()
         //Very important for aligning frames
         rs2::align align(RS2_STREAM_COLOR);
         //Display time
-        // const auto windowName = "Depth and Color Images";
-        // cv::namedWindow(windowName, cv::WINDOW_AUTOSIZE);
+        const auto windowName = "Depth and Color Images";
+        cv::namedWindow(windowName, cv::WINDOW_AUTOSIZE);
 
         //For gyro and accel pose
         double last_ts[RS2_STREAM_COUNT];
         double dt[RS2_STREAM_COUNT];
         std::unique_ptr<FrameProcessor> fp_ptr = std::make_unique<FrameProcessor>(n_threads);
         RotationEstimator algo;
-        // while(cv::waitKey(1) < 0 && cv::getWindowProperty(windowName, cv::WND_PROP_AUTOSIZE) >= 0)
-        while(true)
+        while(cv::waitKey(1) < 0 && cv::getWindowProperty(windowName, cv::WND_PROP_AUTOSIZE) >= 0)
+        // while(true)
         {
             auto start = std::chrono::high_resolution_clock::now();
 
@@ -117,12 +117,13 @@ int main()
             std::cout << "Pitch: " << outputTheta.x << " Yaw: " << outputTheta.y << " Roll: " << outputTheta.z << std::endl;
 
             rs2::frame color_frame = aligned_frames.get_color_frame();
-            rs2::depth_frame aligned_depth_frame = aligned_frames.get_depth_frame();
+            // rs2::depth_frame aligned_depth_frame = aligned_frames.get_depth_frame();
             cv::Mat color_image(cv::Size(640, 480), CV_8UC3, (void*)color_frame.get_data(), cv::Mat::AUTO_STEP);
-            cv::Mat depth_image(cv::Size(640, 480), CV_16UC1, (void*)aligned_depth_frame.get_data(), cv::Mat::AUTO_STEP);
+            // cv::Mat depth_image(cv::Size(640, 480), CV_16UC1, (void*)aligned_depth_frame.get_data(), cv::Mat::AUTO_STEP);
             cv::Mat output_frame;
-            fp_ptr->wrapGoodFeatures(color_image, output_frame);
-            
+            // fp_ptr->wrapGoodFeatures(color_image, output_frame);
+            fp_ptr->orbDetectAndCompute(color_image, output_frame);
+            cv::imshow(windowName, output_frame);
             // Output the duration in milliseconds
             end = std::chrono::high_resolution_clock::now();
             duration = end - new_start;

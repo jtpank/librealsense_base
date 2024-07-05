@@ -98,17 +98,6 @@ void FrameProcessor::wrapGoodFeatures(cv::Mat &inputFrame, cv::Mat &outputFrame)
     cv::goodFeaturesToTrack(grayFrame, corners, max_count, quality_level, min_distance);
     // std::cout << "Corners length: " << corners.size() << std::endl;
 
-    std::vector<cv::KeyPoint> kps1;
-    cv::Mat des1;
-    for(auto &corner : corners)
-    {
-        kps1.emplace_back(cv::KeyPoint(corner, 1.f));
-    }
-    m_pOrb->compute(inputFrame, kps1, des1);
-    
-    // cv::Mat des1;
-    // this->m_pOrb->compute(inputFrame, kps1, des1);
-    // std::cout << "Keypoints Size: " << kps1.size() << std::endl;
 
     //Drawing the features
     int radius = 2;
@@ -119,6 +108,7 @@ void FrameProcessor::wrapGoodFeatures(cv::Mat &inputFrame, cv::Mat &outputFrame)
 
     return;
 }
+
 void FrameProcessor::test_wrapGoodFeatures()
 {   
     //TODO: this returns a cv::Exception if not called from the directory with the image
@@ -133,5 +123,17 @@ void FrameProcessor::test_wrapGoodFeatures()
     {
         cv::imshow(goodFeatsWindow, outputFrame);
     }
+}
+
+void FrameProcessor::orbDetectAndCompute(cv::Mat &inputFrame, cv::Mat &outputFrame)
+{
+    cv::Mat des;
+    cv::Mat grayFrame;
+    inputFrame.copyTo(outputFrame);
+    cv::cvtColor(outputFrame, grayFrame, cv::COLOR_BGR2GRAY);
+    cv::Mat mask = cv::Mat::ones(grayFrame.size(), CV_8UC1) * 255;
+    std::vector<cv::KeyPoint> kps;
+    m_pOrb->detectAndCompute(grayFrame, mask, kps, des);
+    cv::drawKeypoints(inputFrame, kps, outputFrame, cv::Scalar::all(-1), cv::DrawMatchesFlags::DEFAULT);
 
 }

@@ -17,12 +17,13 @@ class FrameProcessor
         unsigned int m_poolSize;
         std::vector<std::thread> m_pool;
         FrameBuffer<rs2::frameset> m_frameBuffer;
-
+        std::deque<cv::Mat> m_frames;
     public:
         FrameProcessor(unsigned int poolSize);
         void frameConsumer(int threadId);
         void processFrameset(rs2::frameset& frameSet);
         void set_depthScale(float depthScale);
         void wrapGoodFeatures(cv::Mat &inputFrame, cv::Mat &outputFrame);
+        void orbDetectAndCompute(cv::Mat &inputFrame, cv::Mat &outputFrame);
         void test_wrapGoodFeatures();
 };
