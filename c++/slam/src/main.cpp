@@ -125,6 +125,7 @@ int main()
                     yaw = yaw * 0.98 + newYaw * 0.02;
                     pitch = pitch * 0.98 + newPitch * 0.02;
                 }
+                std::cout << "av.x=" << av.x << " av.y=" << av.y << " av.z=" << av.z << std::endl;
             }
             if (gyro)
             {
@@ -149,8 +150,8 @@ int main()
             duration = end - new_start;
             std::chrono::duration<double, std::milli> duration_final = end - start;
             // std::cout << "Process Frames: Elapsed time: " << duration.count() << " ms " << std::endl;
-            // std::cout << "Total Elapsed time: " << duration_final.count() << " ms " << std::endl;
-            std::cout << "roll=" << roll*180.0/M_PI << " pitch=" << pitch*180.0/M_PI << " yaw=" << yaw*180.0/M_PI << std::endl;
+            std::cout << "Total Elapsed time: " << duration_final.count() << " ms " << std::endl;
+            
             // std::cout << "accelX=" << accelX*180.0/M_PI << " accelY=" << accelY*180.0/M_PI << " accelZ=" << accelZ*180.0/M_PI << std::endl;
 
 
