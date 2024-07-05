@@ -120,8 +120,8 @@ int main()
                 rs2_vector av = accel.get_motion_data();
                 algo.process_accel(av);
             }
-
-            std::cout << "Roll: " << (algo.get_theta()).x << " Pitch: " << (algo.get_theta()).y << " Yaw: " << (algo.get_theta()).z << std::endl;
+            float3 outputTheta = (algo.get_theta())* 180.0 / M_PI;
+            std::cout << "Roll: " << outputTheta.x << " Pitch: " << outputTheta.y << " Yaw: " << outputTheta.z << std::endl;
 
 
             // Output the duration in milliseconds
