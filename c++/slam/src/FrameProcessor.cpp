@@ -140,12 +140,6 @@ void FrameProcessor::orbDetectAndCompute(cv::Mat &inputFrame, cv::Mat &outputFra
 
     m_kps.push_back(kps);
     m_des.push_back(des);
-
-    //have our first frame now
-    if(!m_hasFirstFrame)
-    {
-        m_hasFirstFrame = true;
-    }
     
 }
 
@@ -153,7 +147,7 @@ void FrameProcessor::bfMatchFrames()
 {
     //knn match
 
-    if(m_hasFirstFrame)
+    if(m_des.size() == 2)
     {
         assert(m_des.size() == 2);   
         std::vector<std::vector<cv::DMatch>> matches;
