@@ -96,7 +96,7 @@ void FrameProcessor::wrapGoodFeatures(cv::Mat &inputFrame, cv::Mat &outputFrame)
     double quality_level = 0.01; 
     double min_distance = 3;
     cv::goodFeaturesToTrack(grayFrame, corners, max_count, quality_level, min_distance);
-    std::cout << "Corners length: " << corners.size() << std::endl;
+    // std::cout << "Corners length: " << corners.size() << std::endl;
 
     std::vector<cv::KeyPoint> kps1;
     cv::Mat des1;
@@ -108,7 +108,7 @@ void FrameProcessor::wrapGoodFeatures(cv::Mat &inputFrame, cv::Mat &outputFrame)
     
     // cv::Mat des1;
     // this->m_pOrb->compute(inputFrame, kps1, des1);
-    std::cout << "Keypoints Size: " << kps1.size() << std::endl;
+    // std::cout << "Keypoints Size: " << kps1.size() << std::endl;
 
     //Drawing the features
     int radius = 2;
