@@ -11,16 +11,7 @@
 #include <chrono>
 
 using namespace std;
-
-
 #define CAPACITY 8
-
-
-//TODO:
-//1. Grab depth frame, vis frame, gyro, and accel frame
-//2. Process these frames
-//3.
-
 
 
 int main()
@@ -60,17 +51,16 @@ int main()
         //Very important for aligning frames
         rs2::align align(RS2_STREAM_COLOR);
         //Display time
-        // const auto color_window_name = "Color Image";
-        // const auto depth_window_name = "Depth Image";
-        // cv::namedWindow(color_window_name, cv::WINDOW_AUTOSIZE);
-        // cv::namedWindow(depth_window_name, cv::WINDOW_AUTOSIZE);
-        const auto windowName = "Depth and Color Images";
-        cv::namedWindow(windowName, cv::WINDOW_AUTOSIZE);
+        // const auto windowName = "Depth and Color Images";
+        // cv::namedWindow(windowName, cv::WINDOW_AUTOSIZE);
+
         std::unique_ptr<FrameProcessor> fp_ptr = std::make_unique<FrameProcessor>(n_threads);
-        //&& cv::getWindowProperty(windowName, cv::WND_PROP_AUTOSIZE) >= 0
-        while(cv::waitKey(1) < 0 && cv::getWindowProperty(windowName, cv::WND_PROP_AUTOSIZE) >= 0)
+
+        // while(cv::waitKey(1) < 0 && cv::getWindowProperty(windowName, cv::WND_PROP_AUTOSIZE) >= 0)
+        while(true)
         {
             auto start = std::chrono::high_resolution_clock::now();
+
             // Camera warmup - dropping several first frames to let auto-exposure stabilize
             rs2::frameset frames, aligned_frames;
             try {
@@ -80,40 +70,60 @@ int main()
                 std::cerr << "RealSense error calling " << e.get_failed_function() << "(" << e.get_failed_args() << "):\n" << e.what() << std::endl;
                 continue;
             }
-            fp_ptr->processFrameset(aligned_frames);
-
-            rs2::frame color_frame = aligned_frames.get_color_frame();
-            cv::Mat color_image(cv::Size(640, 480), CV_8UC3, (void*)color_frame.get_data(), cv::Mat::AUTO_STEP);
-            cv::imshow(windowName, color_image);
-
             auto end = std::chrono::high_resolution_clock::now();
             std::chrono::duration<double, std::milli> duration = end - start;
+            std::cout << "Grab frameset: Elapsed time: " << duration.count() << " ms " << std::endl;
+            
+            auto new_start = std::chrono::high_resolution_clock::now();        
+            for (auto f : aligned_frames)
+            {
+                rs2::stream_profile profile = f.get_profile();
+                unsigned long fnum = f.get_frame_number();
+                double ts = f.get_timestamp();
+                dt[profile.stream_type()] = (ts - last_ts[profile.stream_type()] ) / 1000.0;
+                last_ts[profile.stream_type()] = ts;
+            }
+
+            end = std::chrono::high_resolution_clock::now();
+            duration = end - new_start;
+            std::cout << "Grab timestamps: Elapsed time: " << duration.count() << " ms " << std::endl;
+            
+            //Grab the frames
+            new_start = std::chrono::high_resolution_clock::now();
+            rs2::frame color_frame = aligned_frames.get_color_frame();
+            rs2::depth_frame aligned_depth_frame = aligned_frames.get_depth_frame();
+            rs2::frame accel_frame = aligned_frames.first(RS2_STREAM_ACCEL, RS2_FORMAT_MOTION_XYZ32F);
+            rs2::motion_frame accel = accel_frame.as<rs2::motion_frame>();
+            rs2::frame gyro_frame = aligned_frames.first(RS2_STREAM_GYRO, RS2_FORMAT_MOTION_XYZ32F);
+            rs2::motion_frame gyro = gyro_frame.as<rs2::motion_frame>();
+
+            if (accel)
+            {
+                rs2_vector av = accel.get_motion_data();
+                float R         = sqrtf(av.x * av.x + av.y * av.y + av.z * av.z);
+                float newRoll   = acos(av.x / R);
+                float newYaw    = acos(av.y / R);
+                float newPitch  = acos(av.z / R);
+                // std::cout << "accX=" << newRoll << " accY=" << newYaw << " accZ=" << newPitch << std::endl;
+            }
+            if (gyro)
+            {
+                rs2_vector gv = gyro.get_motion_data();
+                float gvx   = gv.x;
+                float gvy   = gv.y;
+                float gvz   = gv.z;
+                // std::cout << "gvx=" << gvx << " gvy=" << gvy << " gvz=" << gvz << std::endl;
+            }
+
 
             // Output the duration in milliseconds
-            std::cout << "Elapsed time: " << duration.count() << " ms " << " Framerate: " << (1000.0 / duration.count()) << " hz" << std::endl;
+            end = std::chrono::high_resolution_clock::now();
+            duration = end - new_start;
+            duration_final = end - start;
+            std::cout << "Process Frames: Elapsed time: " << duration.count() << " ms " << std::endl;
+            std::cout << "Total Elapsed time: " << duration_final.count() << " ms " << std::endl;
         
 
-
-            //replace the following in the frame processor method
-
-            // Creating OpenCV matrix for image
-            // rs2::frame color_frame = aligned_frames.get_color_frame();
-            // cv::Mat color_image(cv::Size(640, 480), CV_8UC3, (void*)color_frame.get_data(), cv::Mat::AUTO_STEP);
-            // // cv::Mat depth_image(cv::Size(640, 480), CV_16UC1, (void*)aligned_depth_frame.get_data(), cv::Mat::AUTO_STEP);
-            // cv::Mat output_frame;
-            // fp_ptr->wrapGoodFeatures(color_image, output_frame);
-            // // cv::Mat depth_colormap;
-            // // depth_image.convertTo(depth_colormap, CV_8UC1, 0.03);
-            // // cv::applyColorMap(depth_colormap, depth_colormap, cv::COLORMAP_JET);
-
-            // // // Concatenate color and depth frames horizontally
-            // // cv::Mat both_images;
-            // // cv::hconcat(color_image, depth_colormap, both_images);
-
-            // cv::imshow(windowName, color_image);
-            // cv::Mat bothImages;
-            // cv::hconcat(outputFrame, depthColormap, bothImages);
-            // cv::imshow(windowName, bothImages);
         }
     }
     catch (const rs2::error & e)
@@ -234,4 +244,28 @@ int main()
             colorThread.join();
             depthThread.join();
             imuThread.join();
+
+
+
+
+                //replace the following in the frame processor method
+
+            // Creating OpenCV matrix for image
+            // rs2::frame color_frame = aligned_frames.get_color_frame();
+            // cv::Mat color_image(cv::Size(640, 480), CV_8UC3, (void*)color_frame.get_data(), cv::Mat::AUTO_STEP);
+            // // cv::Mat depth_image(cv::Size(640, 480), CV_16UC1, (void*)aligned_depth_frame.get_data(), cv::Mat::AUTO_STEP);
+            // cv::Mat output_frame;
+            // fp_ptr->wrapGoodFeatures(color_image, output_frame);
+            // // cv::Mat depth_colormap;
+            // // depth_image.convertTo(depth_colormap, CV_8UC1, 0.03);
+            // // cv::applyColorMap(depth_colormap, depth_colormap, cv::COLORMAP_JET);
+
+            // // // Concatenate color and depth frames horizontally
+            // // cv::Mat both_images;
+            // // cv::hconcat(color_image, depth_colormap, both_images);
+
+            // cv::imshow(windowName, color_image);
+            // cv::Mat bothImages;
+            // cv::hconcat(outputFrame, depthColormap, bothImages);
+            // cv::imshow(windowName, bothImages);
 */
