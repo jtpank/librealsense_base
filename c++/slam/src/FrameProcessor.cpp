@@ -152,8 +152,10 @@ void FrameProcessor::orbDetectAndCompute(cv::Mat &inputFrame, cv::Mat &outputFra
 void FrameProcessor::bfMatchFrames()
 {
     //knn match
+
     if(m_hasFirstFrame)
     {
+        assert(m_des.size() == 2);   
         std::vector<std::vector<cv::DMatch>> matches;
         m_bfMatcher->knnMatch(m_des.front(), m_des.back(), matches, 2);
 
