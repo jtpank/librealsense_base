@@ -114,7 +114,7 @@ int main()
                 algo.process_accel(av);
             }
             float3 outputTheta = (algo.get_theta())* 180.0 / M_PI;
-            std::cout << "Roll: " << outputTheta.x << " Pitch: " << outputTheta.y << " Yaw: " << outputTheta.z << std::endl;
+            std::cout << "Pitch: " << outputTheta.x << " Yaw: " << outputTheta.y << " Roll: " << outputTheta.z << std::endl;
 
             rs2::frame color_frame = aligned_frames.get_color_frame();
             rs2::depth_frame aligned_depth_frame = aligned_frames.get_depth_frame();

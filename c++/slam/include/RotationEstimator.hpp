@@ -1,8 +1,13 @@
+// License: Apache 2.0. See LICENSE file in root directory.
+// Copyright(c) 2019 Intel Corporation. All Rights Reserved.
+// Adapted From: https://github.com/IntelRealSense/librealsense/blob/master/examples/motion/rs-motion.cpp
+
 #pragma once
 #include <librealsense2/rs.hpp>
 #include <mutex>
 #include "float3.hpp"
- 
+
+
 class RotationEstimator
 {
     // theta is the angle of camera rotation in x, y and z components
