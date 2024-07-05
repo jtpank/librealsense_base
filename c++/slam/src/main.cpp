@@ -119,7 +119,7 @@ int main()
             // Output the duration in milliseconds
             end = std::chrono::high_resolution_clock::now();
             duration = end - new_start;
-            duration_final = end - start;
+            auto duration_final = end - start;
             std::cout << "Process Frames: Elapsed time: " << duration.count() << " ms " << std::endl;
             std::cout << "Total Elapsed time: " << duration_final.count() << " ms " << std::endl;
         
