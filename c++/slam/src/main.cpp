@@ -97,6 +97,10 @@ int main()
             rs2::frame gyro_frame = aligned_frames.first(RS2_STREAM_GYRO, RS2_FORMAT_MOTION_XYZ32F);
             rs2::motion_frame gyro = gyro_frame.as<rs2::motion_frame>();
 
+            cv::Mat color_image(cv::Size(640, 480), CV_8UC3, (void*)color_frame.get_data(), cv::Mat::AUTO_STEP);
+            cv::Mat depth_image(cv::Size(640, 480), CV_16UC1, (void*)aligned_depth_frame.get_data(), cv::Mat::AUTO_STEP);
+            cv::Mat output_frame;
+            fp_ptr->wrapGoodFeatures(color_image, output_frame);
             if (accel)
             {
                 rs2_vector av = accel.get_motion_data();
@@ -119,7 +123,7 @@ int main()
             // Output the duration in milliseconds
             end = std::chrono::high_resolution_clock::now();
             duration = end - new_start;
-            auto duration_final = end - start;
+            std::chrono::duration<double, std::milli> duration_final = end - start;
             std::cout << "Process Frames: Elapsed time: " << duration.count() << " ms " << std::endl;
             std::cout << "Total Elapsed time: " << duration_final.count() << " ms " << std::endl;
         
