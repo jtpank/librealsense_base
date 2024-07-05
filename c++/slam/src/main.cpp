@@ -74,7 +74,7 @@ int main()
             }
             auto end = std::chrono::high_resolution_clock::now();
             std::chrono::duration<double, std::milli> duration = end - start;
-            std::cout << "Grab frameset: Elapsed time: " << duration.count() << " ms " << std::endl;
+            // std::cout << "Grab frameset: Elapsed time: " << duration.count() << " ms " << std::endl;
             
             auto new_start = std::chrono::high_resolution_clock::now();        
             for (auto f : aligned_frames)
@@ -88,7 +88,7 @@ int main()
 
             end = std::chrono::high_resolution_clock::now();
             duration = end - new_start;
-            std::cout << "Grab timestamps: Elapsed time: " << duration.count() << " ms " << std::endl;
+            // std::cout << "Grab timestamps: Elapsed time: " << duration.count() << " ms " << std::endl;
             
             //Grab the frames
             new_start = std::chrono::high_resolution_clock::now();
@@ -103,6 +103,7 @@ int main()
             cv::Mat depth_image(cv::Size(640, 480), CV_16UC1, (void*)aligned_depth_frame.get_data(), cv::Mat::AUTO_STEP);
             cv::Mat output_frame;
             fp_ptr->wrapGoodFeatures(color_image, output_frame);
+            
             if (accel)
             {
                 rs2_vector av = accel.get_motion_data();
