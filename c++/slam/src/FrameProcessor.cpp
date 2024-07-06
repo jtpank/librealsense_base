@@ -170,9 +170,6 @@ void FrameProcessor::frameMatcher()
                     dstPoints.emplace_back((m_kps.back())[match[0].trainIdx].pt);
                 }
             }
-            if(good_matches.size() > 0)
-                printf("QueryIdx: %i, TrainIdx: %i\n", good_matches[0].queryIdx, good_matches[0].trainIdx);
-        
             //so we only have 2
             m_des.pop_front();
             m_kps.pop_front();
@@ -190,5 +187,20 @@ void FrameProcessor::frameMatcher()
 
 void FrameProcessor::poseFromHomography(cv::Mat &H)
 {
+    cv::Mat R(3, 3, CV_64F);
+    cv::Mat_<double> W, U, Vt;
+    cv::SVDecomp(R, W, U, Vt);
+    R = U*Vt;
+    double det = determinant(R);
+    if (det < 0)
+    {
+        Vt.at<double>(2,0) *= -1;
+        Vt.at<double>(2,1) *= -1;
+        Vt.at<double>(2,2) *= -1;
+        
+        R = U*Vt;
+    }
+    std::cout << "R (after polar decomposition):\n" << R << "\ndet(R): " << determinant(R) << std::endl;
+
     return;
 }
