@@ -124,7 +124,7 @@ int main()
             // fp_ptr->wrapGoodFeatures(color_image, output_frame);
             fp_ptr->orbDetectAndCompute(color_image, output_frame);
             //TODO: maybe put the if frames > 0 here?
-            fp_ptr->bfMatchFrames();
+            fp_ptr->frameMatcher();
             cv::imshow(windowName, output_frame);
             // Output the duration in milliseconds
             end = std::chrono::high_resolution_clock::now();

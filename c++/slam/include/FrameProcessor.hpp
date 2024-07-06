@@ -30,6 +30,6 @@ class FrameProcessor
         void set_depthScale(float depthScale);
         void wrapGoodFeatures(cv::Mat &inputFrame, cv::Mat &outputFrame);
         void orbDetectAndCompute(cv::Mat &inputFrame, cv::Mat &outputFrame);
-        void bfMatchFrames();
+        void frameMatcher();
         void test_wrapGoodFeatures();
 };
