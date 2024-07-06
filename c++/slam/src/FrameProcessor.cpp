@@ -161,20 +161,16 @@ void FrameProcessor::frameMatcher()
         std::vector<cv::DMatch> good_matches;
         if(matches.size() >= 2)
         {
-            bool testOne = true;
             for(auto &match : matches)
             {
                 if(match[0].distance < 0.75f * match[1].distance)
                 {    
                     good_matches.emplace_back(match[0]);
-                    if(testOne)
-                    {
-                        testOne = false;
-                        printf("QueryIdx: %i, TrainIdx: %i\n", match[0].queryIdx, match[0].trainIdx);
-                    }
                 }
             }
             std::cout << "good_matches len: " << good_matches.size() << std::endl;
+            if(good_matches.size() > 0)
+                printf("QueryIdx: %i, TrainIdx: %i\n", good_matches[0].queryIdx, good_matches[0].trainIdx);
         }
 
         std::vector<cv::Point2f> srcPoints, dstPoints;
