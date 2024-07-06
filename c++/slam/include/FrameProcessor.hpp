@@ -8,6 +8,7 @@
 #include <iostream>
 #include <thread>
 #include <vector>
+#include <cstdio>
 
 //TODO: must contain the consumer threads
 
