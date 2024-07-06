@@ -35,7 +35,7 @@ void FrameProcessor::frameConsumer(int threadId)
                 // dt[profile.stream_type()] = (ts - last_ts[profile.stream_type()] ) / 1000.0;
                 // last_ts[profile.stream_type()] = ts;
 
-                // std::cout << " threadId: " << threadId << " [ " << profile.stream_name() << " fnum: " << fnum << " ts: " << ts << "]\n";
+                std::cout << " threadId: " << threadId << " [ " << profile.stream_name() << " fnum: " << fnum << " ts: " << ts << "]\n";
                 //" dt: " << dt[profile.stream_type()] << "] \n";
             }
             
