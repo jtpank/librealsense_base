@@ -176,7 +176,7 @@ void FrameProcessor::frameMatcher()
         }
 
         cv::Mat H = cv::findHomography(srcPoints, dstPoints, cv::RANSAC);
-        std::cout << "Homography Mat: \n" << H << std::endl;
+        // std::cout << "Homography Mat: \n" << H << std::endl;
 
     }
     else
