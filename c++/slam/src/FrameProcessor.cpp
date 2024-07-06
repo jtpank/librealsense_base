@@ -169,7 +169,7 @@ void FrameProcessor::frameMatcher()
                     good_matches.emplace_back(match[0]);
                 }
             }
-            // std::cout << "good_matches len: " << good_matches.size() << std::endl;
+            std::cout << "good_matches len: " << good_matches.size() << std::endl;
             // if(good_matches.size() > 0)
             //     printf("QueryIdx: %i, TrainIdx: %i\n", good_matches[0].queryIdx, good_matches[0].trainIdx);
         }
