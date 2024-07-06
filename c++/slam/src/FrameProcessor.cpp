@@ -172,11 +172,11 @@ void FrameProcessor::frameMatcher()
             }
             if(good_matches.size() > 0)
                 printf("QueryIdx: %i, TrainIdx: %i\n", good_matches[0].queryIdx, good_matches[0].trainIdx);
+        
+            //so we only have 2
+            m_des.pop_front();
+            m_kps.pop_front();
         }
-
-        //so we only have 2
-        m_des.pop_front();
-        m_kps.pop_front();
 
         cv::Mat H = cv::findHomography(srcPoints, dstPoints, cv::RANSAC);
         std::cout << "Homography Mat: \n" << H << std::endl;
