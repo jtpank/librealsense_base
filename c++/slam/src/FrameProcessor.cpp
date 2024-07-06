@@ -146,7 +146,7 @@ void FrameProcessor::orbDetectAndCompute(cv::Mat &inputFrame, cv::Mat &outputFra
 void FrameProcessor::bfMatchFrames()
 {
     //knn match
-
+    //https://arxiv.org/pdf/2203.15119
     if(m_des.size() == 2)
     {
         assert(m_des.size() == 2);   
@@ -166,6 +166,7 @@ void FrameProcessor::bfMatchFrames()
                 if(match[0].distance < 0.75f * match[1].distance)
                     good_matches.emplace_back(match[0]);
             }
+            std::cout << "good_matches len: " << good_matches.size() << std::endl;
         }
     }
     else
