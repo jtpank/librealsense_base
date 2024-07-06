@@ -175,9 +175,10 @@ void FrameProcessor::frameMatcher()
             m_kps.pop_front();
         }
 
-        cv::Mat H = cv::findHomography(srcPoints, dstPoints, cv::RANSAC);
-        // std::cout << "Homography Mat: \n" << H << std::endl;
-        this->poseFromHomography(H);
+        // cv::Mat H = cv::findHomography(srcPoints, dstPoints, cv::RANSAC);
+        // this->poseFromHomography(H);
+        
+        
     }
     else
     {

@@ -42,7 +42,9 @@ int main()
         rs2::colorizer color_map;
         //Create a configuration for configuring the pipeline with a non default profile
         rs2::config cfg;
-
+        //May take too long
+        rs2::pointcloud pc;
+        rs2::points points;
         //Add desired streams to configuration
         cfg.enable_stream(RS2_STREAM_ACCEL, RS2_FORMAT_MOTION_XYZ32F);
         cfg.enable_stream(RS2_STREAM_GYRO,  RS2_FORMAT_MOTION_XYZ32F);
@@ -117,7 +119,7 @@ int main()
             std::cout << "Pitch: " << outputTheta.x << " Yaw: " << outputTheta.y << " Roll: " << outputTheta.z << std::endl;
 
             rs2::frame color_frame = aligned_frames.get_color_frame();
-            // rs2::depth_frame aligned_depth_frame = aligned_frames.get_depth_frame();
+            rs2::depth_frame aligned_depth_frame = aligned_frames.get_depth_frame();
             cv::Mat color_image(cv::Size(640, 480), CV_8UC3, (void*)color_frame.get_data(), cv::Mat::AUTO_STEP);
             // cv::Mat depth_image(cv::Size(640, 480), CV_16UC1, (void*)aligned_depth_frame.get_data(), cv::Mat::AUTO_STEP);
             cv::Mat output_frame;
@@ -125,6 +127,7 @@ int main()
             fp_ptr->orbDetectAndCompute(color_image, output_frame);
             //TODO: maybe put the if frames > 0 here?
             fp_ptr->frameMatcher();
+            points = pc.calculate(aligned_depth_frame);
             cv::imshow(windowName, output_frame);
             // Output the duration in milliseconds
             end = std::chrono::high_resolution_clock::now();
