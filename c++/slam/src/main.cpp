@@ -65,8 +65,8 @@ int main()
         double dt[RS2_STREAM_COUNT];
         std::unique_ptr<FrameProcessor> fp_ptr = std::make_unique<FrameProcessor>(n_threads);
         RotationEstimator algo;
-        while(cv::waitKey(1) < 0 && cv::getWindowProperty(windowName, cv::WND_PROP_AUTOSIZE) >= 0)
-        // while(true)
+        // while(cv::waitKey(1) < 0 && cv::getWindowProperty(windowName, cv::WND_PROP_AUTOSIZE) >= 0)
+        while(true)
         {
             auto start = std::chrono::high_resolution_clock::now();
 
