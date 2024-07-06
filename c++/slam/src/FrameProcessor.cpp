@@ -40,7 +40,7 @@ void FrameProcessor::frameConsumer(int threadId)
             }
             
             //Get the frames
-            // rs2::frame color_frame = aligned_frames.get_color_frame();
+            rs2::frame color_frame = aligned_frames.get_color_frame();
             rs2::depth_frame aligned_depth_frame = aligned_frames.get_depth_frame();
             rs2::frame accel_frame = aligned_frames.first(RS2_STREAM_ACCEL, RS2_FORMAT_MOTION_XYZ32F);
             rs2::motion_frame accel = accel_frame.as<rs2::motion_frame>();
@@ -71,6 +71,10 @@ void FrameProcessor::frameConsumer(int threadId)
                 float gvz  = gv.z;
                 // std::cout << "gvx=" << gvx << " gvy=" << gvy << " gvz=" << gvz << std::endl;
             }
+            cv::Mat color_image(cv::Size(640, 480), CV_8UC3, (void*)color_frame.get_data(), cv::Mat::AUTO_STEP);
+            cv::Mat depth_image(cv::Size(640, 480), CV_16UC1, (void*)aligned_depth_frame.get_data(), cv::Mat::AUTO_STEP);
+            cv::Mat output_frame;
+            orbDetectAndCompute(color_image, output_frame);
         }
         catch(const std::runtime_error &e){
         }

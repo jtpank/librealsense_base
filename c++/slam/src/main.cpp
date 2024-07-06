@@ -97,7 +97,7 @@ int main()
             duration = end - new_start;
             // std::cout << "Grab timestamps: Elapsed time: " << duration.count() << " ms " << std::endl;
             
-            // fp_ptr->processFrameset(aligned_frames);
+            fp_ptr->processFrameset(aligned_frames);
 
 
 
@@ -122,33 +122,33 @@ int main()
 
 
             //Grab the frames
-            new_start = std::chrono::high_resolution_clock::now();
-            rs2::frame accel_frame = aligned_frames.first(RS2_STREAM_ACCEL, RS2_FORMAT_MOTION_XYZ32F);
-            rs2::motion_frame accel = accel_frame.as<rs2::motion_frame>();
-            rs2::frame gyro_frame = aligned_frames.first(RS2_STREAM_GYRO, RS2_FORMAT_MOTION_XYZ32F);
-            rs2::motion_frame gyro = gyro_frame.as<rs2::motion_frame>();
-            double gyro_ts = gyro.get_timestamp();
+            // new_start = std::chrono::high_resolution_clock::now();
+            // rs2::frame accel_frame = aligned_frames.first(RS2_STREAM_ACCEL, RS2_FORMAT_MOTION_XYZ32F);
+            // rs2::motion_frame accel = accel_frame.as<rs2::motion_frame>();
+            // rs2::frame gyro_frame = aligned_frames.first(RS2_STREAM_GYRO, RS2_FORMAT_MOTION_XYZ32F);
+            // rs2::motion_frame gyro = gyro_frame.as<rs2::motion_frame>();
+            // double gyro_ts = gyro.get_timestamp();
 
-            if (gyro)
-            {
-                rs2_vector gv = gyro.get_motion_data();
-                algo.process_gyro(gv, gyro_ts);
-            }
-            if (accel)
-            {
-                rs2_vector av = accel.get_motion_data();
-                algo.process_accel(av);
-            }
-            float3 outputTheta = (algo.get_theta())* 180.0 / M_PI;
-            // std::cout << "Pitch: " << outputTheta.x << " Yaw: " << outputTheta.y << " Roll: " << outputTheta.z << std::endl;
+            // if (gyro)
+            // {
+            //     rs2_vector gv = gyro.get_motion_data();
+            //     algo.process_gyro(gv, gyro_ts);
+            // }
+            // if (accel)
+            // {
+            //     rs2_vector av = accel.get_motion_data();
+            //     algo.process_accel(av);
+            // }
+            // float3 outputTheta = (algo.get_theta())* 180.0 / M_PI;
+            // // std::cout << "Pitch: " << outputTheta.x << " Yaw: " << outputTheta.y << " Roll: " << outputTheta.z << std::endl;
 
-            rs2::frame color_frame = aligned_frames.get_color_frame();
-            rs2::depth_frame aligned_depth_frame = aligned_frames.get_depth_frame();
-            cv::Mat color_image(cv::Size(640, 480), CV_8UC3, (void*)color_frame.get_data(), cv::Mat::AUTO_STEP);
-            cv::Mat depth_image(cv::Size(640, 480), CV_16UC1, (void*)aligned_depth_frame.get_data(), cv::Mat::AUTO_STEP);
-            cv::Mat output_frame;
-            // fp_ptr->wrapGoodFeatures(color_image, output_frame);
-            fp_ptr->orbDetectAndCompute(color_image, output_frame);
+            // rs2::frame color_frame = aligned_frames.get_color_frame();
+            // rs2::depth_frame aligned_depth_frame = aligned_frames.get_depth_frame();
+            // cv::Mat color_image(cv::Size(640, 480), CV_8UC3, (void*)color_frame.get_data(), cv::Mat::AUTO_STEP);
+            // cv::Mat depth_image(cv::Size(640, 480), CV_16UC1, (void*)aligned_depth_frame.get_data(), cv::Mat::AUTO_STEP);
+            // cv::Mat output_frame;
+            // // fp_ptr->wrapGoodFeatures(color_image, output_frame);
+            // fp_ptr->orbDetectAndCompute(color_image, output_frame);
             //TODO: maybe put the if frames > 0 here?
             // fp_ptr->frameMatcher();
             // points = pc.calculate(aligned_depth_frame);
@@ -159,9 +159,9 @@ int main()
             // cv::imshow(windowName, color_image);
             // // Output the duration in milliseconds
             end = std::chrono::high_resolution_clock::now();
-            duration = end - new_start;
+            // duration = end - new_start;
             std::chrono::duration<double, std::milli> duration_final = end - start;
-            std::cout << "Process Frames: Elapsed time: " << duration.count() << " ms " << std::endl;
+            // std::cout << "Process Frames: Elapsed time: " << duration.count() << " ms " << std::endl;
             std::cout << "Total Elapsed time: " << duration_final.count() << " ms " << std::endl;
             
           
