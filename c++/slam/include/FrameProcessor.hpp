@@ -32,5 +32,6 @@ class FrameProcessor
         void wrapGoodFeatures(cv::Mat &inputFrame, cv::Mat &outputFrame);
         void orbDetectAndCompute(cv::Mat &inputFrame, cv::Mat &outputFrame);
         void frameMatcher();
+        void poseFromHomography(cv::Mat &H);
         void test_wrapGoodFeatures();
 };

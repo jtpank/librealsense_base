@@ -153,12 +153,8 @@ void FrameProcessor::frameMatcher()
         std::vector<std::vector<cv::DMatch>> matches;
         m_bfMatcher->knnMatch(m_des.front(), m_des.back(), matches, 2);
 
-        //so we only have 2
-        m_des.pop_front();
-        m_kps.pop_front();
-        std::cout << "matching!\n";
-
         std::vector<cv::DMatch> good_matches;
+        std::vector<cv::Point2f> srcPoints, dstPoints;
         if(matches.size() >= 2)
         {
             for(auto &match : matches)
@@ -166,18 +162,33 @@ void FrameProcessor::frameMatcher()
                 if(match[0].distance < 0.75f * match[1].distance)
                 {    
                     good_matches.emplace_back(match[0]);
+
+                    // cv::Point2f srcPoint, dstPoint;
+                    // srcPoint = m_kps.front().pt
+                    // dstPoint = m_kps.back().pt;
+                    srcPoints.emplace_back((m_kps.front())[match[0].queryIdx].pt);
+                    dstPoints.emplace_back((m_kps.back())[match[0].trainIdx].pt);
                 }
             }
             if(good_matches.size() > 0)
                 printf("QueryIdx: %i, TrainIdx: %i\n", good_matches[0].queryIdx, good_matches[0].trainIdx);
         }
 
-        // std::vector<cv::Point2f> srcPoints, dstPoints;
-        // cv::Mat H = cv::findHomography(srcPoints, dstPoints, cv::RANSAC);
+        //so we only have 2
+        m_des.pop_front();
+        m_kps.pop_front();
+
+        cv::Mat H = cv::findHomography(srcPoints, dstPoints, cv::RANSAC);
+        std::cout << "Homography Mat: \n" << H << std::endl;
 
     }
     else
     {
         std::cout << "not matching\n";
     }
+}
+
+void FrameProcessor::poseFromHomography(cv::Mat &H)
+{
+    return;
 }
