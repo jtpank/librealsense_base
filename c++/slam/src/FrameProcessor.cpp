@@ -177,7 +177,7 @@ void FrameProcessor::frameMatcher()
 
         cv::Mat H = cv::findHomography(srcPoints, dstPoints, cv::RANSAC);
         // std::cout << "Homography Mat: \n" << H << std::endl;
-
+        this->poseFromHomography(H);
     }
     else
     {
@@ -187,6 +187,7 @@ void FrameProcessor::frameMatcher()
 
 void FrameProcessor::poseFromHomography(cv::Mat &H)
 {
+    //From: https://docs.opencv.org/3.4/d0/d92/samples_2cpp_2tutorial_code_2features2D_2Homography_2pose_from_homography_8cpp-example.html#a16
     cv::Mat R(3, 3, CV_64F);
     cv::Mat_<double> W, U, Vt;
     cv::SVDecomp(R, W, U, Vt);
