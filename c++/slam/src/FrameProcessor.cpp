@@ -216,7 +216,8 @@ void FrameProcessor::frameMatcher()
         good_srcCentroid = good_srcCentroid / static_cast<float>(good_srcPoints.size());
         good_dstCentroid = good_dstCentroid / static_cast<float>(good_dstPoints.size());
 
-
+        std::cout << "good_srcCentroid: x,y,z: " << good_srcCentroid.x << "," << good_srcCentroid.y << "," << good_srcCentroid.z << std::endl;
+        std::cout << "good_dstCentroid: x,y,z: " << good_dstCentroid.x << "," << good_dstCentroid.y << "," << good_dstCentroid.z << std::endl;  
         
         //2. compute centralized vectors
         //3. find covariance matrix'
