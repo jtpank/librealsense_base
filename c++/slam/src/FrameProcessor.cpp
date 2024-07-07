@@ -1,7 +1,7 @@
 #include "FrameProcessor.hpp"
 
 FrameProcessor::FrameProcessor(unsigned int poolSize) 
-: m_pOrb(cv::ORB::create()), m_bfMatcher(cv::BFMatcher::create(cv::NORM_HAMMING)), 
+: m_pOrb(cv::ORB::create()), m_bfMatcher(cv::BFMatcher::create(cv::NORM_HAMMING)),
 m_poolSize(poolSize), m_frameBuffer(poolSize), m_hasFirstFrame(false)
 {   
     std::cout << "\nSetting up thread pool: " << std::endl;
@@ -234,8 +234,25 @@ void FrameProcessor::frameMatcher()
             cent_dstVector.emplace_back(dstCent);
         }
         //3. find covariance matrix S
-        
+        cv::Mat srcMat = cv::Mat::zeros(3, cent_srcVector.size(),CV_32FC1);
+        cv::Mat dstMat = cv::Mat::zeros(3, cent_srcVector.size(),CV_32FC1);
+        cv::Mat dstTranspose;
+        for(int i = 0; i < cent_srcVector.size(); ++i)
+        {
+            srcMat.at<double>(0, i) = cent_srcVector[i].x;
+            srcMat.at<double>(1, i) = cent_srcVector[i].y;
+            srcMat.at<double>(2, i) = cent_srcVector[i].z;
+
+            dstMat.at<double>(0, i) = cent_dstVector[i].x;
+            dstMat.at<double>(1, i) = cent_dstVector[i].y;
+            dstMat.at<double>(2, i) = cent_dstVector[i].z;
+        }
+        cv::transpose(dstMat, dstTranspose);
+        cv::Mat covMat = srcMat * dstTranspose;
+        assert(covMat.rows == covMat.cols == 3);
         //4. perform SVD.
+        cv::Mat_<double> w, u, vt;
+        cv::SVDecomp(covMat,w, u, vt);
         //5. Output R_3x3 rotation matrix and tr_3x1 translation vector
 
         
