@@ -196,6 +196,8 @@ void FrameProcessor::frameMatcher()
             m_kps.pop_front();
             m_vertices.pop_front();
         }
+        assert(good_srcPoints.size() == good_dstPoints.size());
+        assert(good_matches.size() == good_srcPoints.size());
 
         //1. compute the centroids
         //2. compute centralized vectors
