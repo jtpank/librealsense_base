@@ -5,6 +5,7 @@
 #include <cassert>
 #include <librealsense2/rs.hpp> 
 #include "FrameBuffer.hpp"
+#include "float3.hpp"
 #include <iostream>
 #include <thread>
 #include <vector>

@@ -198,8 +198,26 @@ void FrameProcessor::frameMatcher()
         }
         assert(good_srcPoints.size() == good_dstPoints.size());
         assert(good_matches.size() == good_srcPoints.size());
+        
 
         //1. compute the centroids
+        float3 good_srcCentroid, good_dstCentroid;
+        good_srcCentroid.x = 0.f;
+        good_srcCentroid.y = 0.f;
+        good_srcCentroid.z = 0.f;
+        good_dstCentroid.x = 0.f;
+        good_dstCentroid.y = 0.f;
+        good_dstCentroid.z = 0.f;
+        for(int i = 0; i < good_srcPoints.size(); ++i)
+        {
+            good_srcCentroid.add(good_srcPoints[i].x, good_srcPoints[i].y, good_srcPoints[i].z);
+            good_dstCentroid.add(good_dstPoints[i].x, good_dstPoints[i].y, good_dstPoints[i].z);
+        }
+        good_srcCentroid = good_srcCentroid / static_cast<float>(good_srcPoints.size());
+        good_dstCentroid = good_dstCentroid / static_cast<float>(good_dstPoints.size());
+
+
+        
         //2. compute centralized vectors
         //3. find covariance matrix'
         //4. perform SVD.
