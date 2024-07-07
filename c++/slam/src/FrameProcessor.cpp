@@ -220,7 +220,21 @@ void FrameProcessor::frameMatcher()
         std::cout << "good_dstCentroid: x,y,z: " << good_dstCentroid.x << "," << good_dstCentroid.y << "," << good_dstCentroid.z << std::endl;  
         
         //2. compute centralized vectors
-        //3. find covariance matrix'
+        std::vector<float3> cent_srcVector, cent_dstVector;
+        for(int i = 0; i < good_srcPoints.size(); ++i)
+        {
+            float3 srcCent, dstCent;
+            srcCent.x = good_srcPoints[i].x - good_srcCentroid.x;
+            srcCent.y = good_srcPoints[i].y - good_srcCentroid.y;
+            srcCent.z = good_srcPoints[i].z - good_srcCentroid.z;
+            dstCent.x = good_dstPoints[i].x - good_dstCentroid.x;
+            dstCent.y = good_dstPoints[i].y - good_dstCentroid.y;
+            dstCent.z = good_dstPoints[i].z - good_dstCentroid.z;
+            cent_srcVector.emplace_back(srcCent);
+            cent_dstVector.emplace_back(dstCent);
+        }
+        //3. find covariance matrix S
+        
         //4. perform SVD.
         //5. Output R_3x3 rotation matrix and tr_3x1 translation vector
 
