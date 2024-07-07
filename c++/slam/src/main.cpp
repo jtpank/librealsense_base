@@ -134,6 +134,9 @@ int main()
             auto vertices = points.get_vertices();
             std::cout << "points len: " << points.size() << std::endl;
             std::cout << "depth image size: " << depth_image.rows << "," << depth_image.cols << std::endl;
+            int t_row = 5;
+            int t_col = 10;
+            std::cout << "vertex vs depth: " << vertices[t_row*480 + t_col] << " | " << depth_image.at<double>(t_row, t_col) << std::endl;
             // std::cout << "vertex: " << vertices
             //grab the xyz point set found from framematcher
             // run the algorithm in https://arxiv.org/pdf/2203.15119
