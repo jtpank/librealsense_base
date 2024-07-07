@@ -124,20 +124,14 @@ int main()
             rs2::frame color_frame = aligned_frames.get_color_frame();
             rs2::depth_frame aligned_depth_frame = aligned_frames.get_depth_frame();
             cv::Mat color_image(cv::Size(640, 480), CV_8UC3, (void*)color_frame.get_data(), cv::Mat::AUTO_STEP);
-            cv::Mat depth_image(cv::Size(640, 480), CV_16UC1, (void*)aligned_depth_frame.get_data(), cv::Mat::AUTO_STEP);
+            // cv::Mat depth_image(cv::Size(640, 480), CV_16UC1, (void*)aligned_depth_frame.get_data(), cv::Mat::AUTO_STEP);
             cv::Mat output_frame;
             // fp_ptr->wrapGoodFeatures(color_image, output_frame);
             fp_ptr->orbDetectAndCompute(color_image, output_frame);
             // TODO: maybe put the if frames > 0 here?
             fp_ptr->frameMatcher();
-            points = pc.calculate(aligned_depth_frame);
-            auto vertices = points.get_vertices();
-            std::cout << "points len: " << points.size() << std::endl;
-            std::cout << "depth image size: " << depth_image.rows << "," << depth_image.cols << std::endl;
-            int t_row = 240;
-            int t_col = 320;
-            std::cout << "vertex vs depth: " << vertices[t_row*480 + t_col].z << " | " << depth_image.at<double>(t_col, t_row) << std::endl;
-            // std::cout << "vertex: " << vertices
+
+
             //grab the xyz point set found from framematcher
             // run the algorithm in https://arxiv.org/pdf/2203.15119
             // and then we use the translation vector and rotation matrix as our odometry

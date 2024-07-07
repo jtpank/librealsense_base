@@ -147,6 +147,13 @@ void FrameProcessor::orbDetectAndCompute(cv::Mat &inputFrame, cv::Mat &outputFra
     
 }
 
+void FrameProcessor::grabVertices(rs2::depth_frame &depth_frame, rs2::points &points, rs2::pointcloud &pc)
+{
+    points = pc.calculate(depth_frame);
+    const rs2::vertex* vertices = points.get_vertices();
+    m_vertices.push_back(vertices);
+}
+
 void FrameProcessor::frameMatcher()
 {
     //knn match
@@ -154,10 +161,13 @@ void FrameProcessor::frameMatcher()
     if(m_des.size() == 2)
     {
         assert(m_des.size() == 2);   
+        assert(m_vertices.size() == 2); 
         std::vector<std::vector<cv::DMatch>> matches;
         m_bfMatcher->knnMatch(m_des.front(), m_des.back(), matches, 2);
 
         std::vector<cv::DMatch> good_matches;
+        std::vector<rs2::vertex> good_srcPoints; // 3-D x,y,z from pointcloud
+        std::vector<rs2::vertex> good_dstPoints; // 3-D x,y,z from pointcloud
         std::vector<cv::Point2f> srcPoints, dstPoints;
         if(matches.size() >= 2)
         {
@@ -167,20 +177,31 @@ void FrameProcessor::frameMatcher()
                 {    
                     good_matches.emplace_back(match[0]);
 
-                    // cv::Point2f srcPoint, dstPoint;
-                    // srcPoint = m_kps.front().pt
-                    // dstPoint = m_kps.back().pt;
-                    srcPoints.emplace_back((m_kps.front())[match[0].queryIdx].pt);
-                    dstPoints.emplace_back((m_kps.back())[match[0].trainIdx].pt);
+                    cv::Point2f srcPoint, dstPoint;
+                    srcPoint = (m_kps.front())[match[0].queryIdx].pt;
+                    dstPoint = (m_kps.back())[match[0].trainIdx].pt;
+                    srcPoints.emplace_back(srcPoint);
+                    dstPoints.emplace_back(dstPoint);
+
+                    const rs2::vertex* queryVertices = m_vertices.back();
+                    const rs2::vertex* trainVertices = m_vertices.front();
+                    //TODO: Ensure this is correct (row major, I believe)
+                    good_srcPoints.emplace_back(queryVertices[static_cast<int>(srcPoint.x)*480 + static_cast<int>(srcPoint.y)]);
+                    good_dstPoints.emplace_back(trainVertices[static_cast<int>(dstPoint.x)*480 + static_cast<int>(dstPoint.y)]);
+                    
                 }
             }
             //so we only have 2
             m_des.pop_front();
             m_kps.pop_front();
+            m_vertices.pop_front();
         }
 
-        // cv::Mat H = cv::findHomography(srcPoints, dstPoints, cv::RANSAC);
-        // this->poseFromHomography(H);
+        //1. compute the centroids
+        //2. compute centralized vectors
+        //3. find covariance matrix'
+        //4. perform SVD.
+        //5. Output R_3x3 rotation matrix and tr_3x1 translation vector
 
         
     }

@@ -23,6 +23,7 @@ class FrameProcessor
         FrameBuffer<rs2::frameset> m_frameBuffer;
         bool m_hasFirstFrame;
         std::deque<std::vector<cv::KeyPoint>> m_kps;
+        std::deque<const rs2::vertex*> m_vertices;
         std::deque<cv::Mat> m_des;
     public:
         FrameProcessor(unsigned int poolSize);
@@ -31,6 +32,7 @@ class FrameProcessor
         void set_depthScale(float depthScale);
         void wrapGoodFeatures(cv::Mat &inputFrame, cv::Mat &outputFrame);
         void orbDetectAndCompute(cv::Mat &inputFrame, cv::Mat &outputFrame);
+        void grabVertices(rs2::depth_frame &depth_frame, rs2::points &points, rs2::pointcloud &pc);
         void frameMatcher();
         void poseFromHomography(cv::Mat &H);
         void test_wrapGoodFeatures();
