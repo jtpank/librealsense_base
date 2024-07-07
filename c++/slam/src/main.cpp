@@ -131,16 +131,19 @@ int main()
             // TODO: maybe put the if frames > 0 here?
             fp_ptr->frameMatcher();
             points = pc.calculate(aligned_depth_frame);
-
+            auto vertices = points.get_vertices();
+            std::cout << "points len: " << points.size() << std::endl;
+            std::cout << "depth image size: " << depth_image.rows << "," << depth_image.cols << std::endl;
+            // std::cout << "vertex: " << vertices
             //grab the xyz point set found from framematcher
             // run the algorithm in https://arxiv.org/pdf/2203.15119
             // and then we use the translation vector and rotation matrix as our odometry
-            cv::imshow(windowName, color_image);
+            // cv::imshow(windowName, color_image);
             // // Output the duration in milliseconds
             end = std::chrono::high_resolution_clock::now();
             // duration = end - new_start;
             std::chrono::duration<double, std::milli> duration_final = end - start;
-            std::cout << "Process Frames: Elapsed time: " << duration.count() << " ms " << std::endl;
+            // std::cout << "Process Frames: Elapsed time: " << duration.count() << " ms " << std::endl;
             std::cout << "Total Elapsed time: " << duration_final.count() << " ms " << std::endl;
             
           
