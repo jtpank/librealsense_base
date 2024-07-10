@@ -144,6 +144,8 @@ void FrameProcessor::orbDetectAndCompute(cv::Mat &inputFrame, cv::Mat &outputFra
 
     m_kps.push_back(kps);
     m_des.push_back(des);
+    std::cout << "m_kps size: "<< m_kps.size() << std::endl;
+    std::cout << "m_des size: "<< m_des.size() << std::endl;
     
 }
 

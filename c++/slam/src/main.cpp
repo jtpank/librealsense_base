@@ -131,6 +131,7 @@ int main()
             fp_ptr->grabVertices(aligned_depth_frame, points, pc);
             // TODO: maybe put the if frames > 0 here?
             fp_ptr->frameMatcher();
+            
 
 
             //grab the xyz point set found from framematcher
