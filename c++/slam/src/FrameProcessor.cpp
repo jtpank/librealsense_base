@@ -193,11 +193,11 @@ void FrameProcessor::frameMatcher()
                     
                 }
             }
-            //so we only have 2
-            m_des.pop_front();
-            m_kps.pop_front();
-            m_vertices.pop_front();
         }
+        //so we only have 2
+        m_des.pop_front();
+        m_kps.pop_front();
+        m_vertices.pop_front();
         assert(good_srcPoints.size() == good_dstPoints.size());
         assert(good_matches.size() == good_srcPoints.size());
         std::cout << "size: " << good_srcPoints.size() << std::endl;
