@@ -136,7 +136,7 @@ int main()
             //grab the xyz point set found from framematcher
             // run the algorithm in https://arxiv.org/pdf/2203.15119
             // and then we use the translation vector and rotation matrix as our odometry
-            // cv::imshow(windowName, color_image);
+            cv::imshow(windowName, color_image);
             // // Output the duration in milliseconds
             end = std::chrono::high_resolution_clock::now();
             // duration = end - new_start;
