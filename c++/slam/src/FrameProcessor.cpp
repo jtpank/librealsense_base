@@ -251,7 +251,8 @@ void FrameProcessor::frameMatcher()
         }
         cv::transpose(dstMat, dstTranspose);
         cv::Mat covMat = srcMat * dstTranspose;
-        assert(covMat.rows == covMat.cols == 3);
+        assert(covMat.rows == covMat.cols);
+        assert(covMat.rows == 3);
         //4. perform SVD.
         cv::Mat_<double> w, u, vt;
         cv::SVDecomp(covMat,w, u, vt);
