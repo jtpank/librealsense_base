@@ -222,37 +222,37 @@ void FrameProcessor::frameMatcher()
         std::cout << "good_dstCentroid: x,y,z: " << good_dstCentroid.x << "," << good_dstCentroid.y << "," << good_dstCentroid.z << std::endl;  
         
         //2. compute centralized vectors
-        std::vector<float3> cent_srcVector, cent_dstVector;
-        for(int i = 0; i < good_srcPoints.size(); ++i)
-        {
-            float3 srcCent, dstCent;
-            srcCent.x = good_srcPoints[i].x - good_srcCentroid.x;
-            srcCent.y = good_srcPoints[i].y - good_srcCentroid.y;
-            srcCent.z = good_srcPoints[i].z - good_srcCentroid.z;
-            dstCent.x = good_dstPoints[i].x - good_dstCentroid.x;
-            dstCent.y = good_dstPoints[i].y - good_dstCentroid.y;
-            dstCent.z = good_dstPoints[i].z - good_dstCentroid.z;
-            cent_srcVector.emplace_back(srcCent);
-            cent_dstVector.emplace_back(dstCent);
-        }
-        //3. find covariance matrix S
-        cv::Mat srcMat = cv::Mat::zeros(3, cent_srcVector.size(),CV_32FC1);
-        cv::Mat dstMat = cv::Mat::zeros(3, cent_srcVector.size(),CV_32FC1);
-        cv::Mat dstTranspose;
-        for(int i = 0; i < cent_srcVector.size(); ++i)
-        {
-            srcMat.at<double>(0, i) = cent_srcVector[i].x;
-            srcMat.at<double>(1, i) = cent_srcVector[i].y;
-            srcMat.at<double>(2, i) = cent_srcVector[i].z;
+        // std::vector<float3> cent_srcVector, cent_dstVector;
+        // for(int i = 0; i < good_srcPoints.size(); ++i)
+        // {
+        //     float3 srcCent, dstCent;
+        //     srcCent.x = good_srcPoints[i].x - good_srcCentroid.x;
+        //     srcCent.y = good_srcPoints[i].y - good_srcCentroid.y;
+        //     srcCent.z = good_srcPoints[i].z - good_srcCentroid.z;
+        //     dstCent.x = good_dstPoints[i].x - good_dstCentroid.x;
+        //     dstCent.y = good_dstPoints[i].y - good_dstCentroid.y;
+        //     dstCent.z = good_dstPoints[i].z - good_dstCentroid.z;
+        //     cent_srcVector.emplace_back(srcCent);
+        //     cent_dstVector.emplace_back(dstCent);
+        // }
+        // //3. find covariance matrix S
+        // cv::Mat srcMat = cv::Mat::zeros(3, cent_srcVector.size(),CV_32FC1);
+        // cv::Mat dstMat = cv::Mat::zeros(3, cent_srcVector.size(),CV_32FC1);
+        // cv::Mat dstTranspose;
+        // for(int i = 0; i < cent_srcVector.size(); ++i)
+        // {
+        //     srcMat.at<double>(0, i) = cent_srcVector[i].x;
+        //     srcMat.at<double>(1, i) = cent_srcVector[i].y;
+        //     srcMat.at<double>(2, i) = cent_srcVector[i].z;
 
-            dstMat.at<double>(0, i) = cent_dstVector[i].x;
-            dstMat.at<double>(1, i) = cent_dstVector[i].y;
-            dstMat.at<double>(2, i) = cent_dstVector[i].z;
-        }
-        cv::transpose(dstMat, dstTranspose);
-        cv::Mat covMat = srcMat * dstTranspose;
-        assert(covMat.rows == covMat.cols);
-        assert(covMat.rows == 3);
+        //     dstMat.at<double>(0, i) = cent_dstVector[i].x;
+        //     dstMat.at<double>(1, i) = cent_dstVector[i].y;
+        //     dstMat.at<double>(2, i) = cent_dstVector[i].z;
+        // }
+        // cv::transpose(dstMat, dstTranspose);
+        // cv::Mat covMat = srcMat * dstTranspose;
+        // assert(covMat.rows == covMat.cols);
+        // assert(covMat.rows == 3);
         //4. perform SVD.
         // cv::Mat_<double> w, u, vt;
         // cv::SVDecomp(covMat,w, u, vt);
