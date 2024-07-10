@@ -94,7 +94,6 @@ int main()
             // fp_ptr->processFrameset(aligned_frames);
 
             //Grab the frames
-            // new_start = std::chrono::high_resolution_clock::now();
             // rs2::frame accel_frame = aligned_frames.first(RS2_STREAM_ACCEL, RS2_FORMAT_MOTION_XYZ32F);
             // rs2::motion_frame accel = accel_frame.as<rs2::motion_frame>();
             // rs2::frame gyro_frame = aligned_frames.first(RS2_STREAM_GYRO, RS2_FORMAT_MOTION_XYZ32F);
@@ -117,10 +116,9 @@ int main()
             rs2::frame color_frame = aligned_frames.get_color_frame();
             rs2::depth_frame aligned_depth_frame = aligned_frames.get_depth_frame();
             cv::Mat color_image(cv::Size(640, 480), CV_8UC3, (void*)color_frame.get_data(), cv::Mat::AUTO_STEP);
-            // cv::Mat depth_image(cv::Size(640, 480), CV_16UC1, (void*)aligned_depth_frame.get_data(), cv::Mat::AUTO_STEP);
+            cv::Mat depth_image(cv::Size(640, 480), CV_16UC1, (void*)aligned_depth_frame.get_data(), cv::Mat::AUTO_STEP);
             cv::Mat output_frame;
-            // fp_ptr->wrapGoodFeatures(color_image, output_frame);
-            // fp_ptr->orbDetectAndCompute(color_image, output_frame);
+            fp_ptr->orbDetectAndCompute(color_image, output_frame);
             // fp_ptr->grabVertices(aligned_depth_frame, points, pc);
             // // TODO: maybe put the if frames > 0 here?
             // fp_ptr->frameMatcher();
@@ -130,7 +128,7 @@ int main()
             //grab the xyz point set found from framematcher
             // run the algorithm in https://arxiv.org/pdf/2203.15119
             // and then we use the translation vector and rotation matrix as our odometry
-            cv::imshow(windowName, color_image);
+            // cv::imshow(windowName, color_image);
 
 
             std::chrono::duration<double, std::milli> duration = end - start;
