@@ -254,9 +254,9 @@ void FrameProcessor::frameMatcher()
         assert(covMat.rows == covMat.cols);
         assert(covMat.rows == 3);
         //4. perform SVD.
-        cv::Mat_<double> w, u, vt;
-        cv::SVDecomp(covMat,w, u, vt);
-        std::cout << "CovMat: \n" << covMat << std::endl;
+        // cv::Mat_<double> w, u, vt;
+        // cv::SVDecomp(covMat,w, u, vt);
+        // std::cout << "CovMat: \n" << covMat << std::endl;
         //5. Output R_3x3 rotation matrix and tr_3x1 translation vector
 
         
