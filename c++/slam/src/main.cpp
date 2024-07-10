@@ -65,11 +65,13 @@ int main()
         double dt[RS2_STREAM_COUNT];
         std::unique_ptr<FrameProcessor> fp_ptr = std::make_unique<FrameProcessor>(n_threads);
         RotationEstimator algo;
-        while(cv::waitKey(1) < 0 && cv::getWindowProperty(windowName, cv::WND_PROP_AUTOSIZE) >= 0)
-        // while(true)
-        {
-            auto start = std::chrono::high_resolution_clock::now();
 
+        int fps_count = 0;
+        auto start = std::chrono::high_resolution_clock::now();
+
+        while(cv::waitKey(1) < 0 && cv::getWindowProperty(windowName, cv::WND_PROP_AUTOSIZE) >= 0)
+        {
+            auto end = std::chrono::high_resolution_clock::now();
             // Camera warmup - dropping several first frames to let auto-exposure stabilize
             rs2::frameset frames, aligned_frames;
             try {
@@ -79,11 +81,7 @@ int main()
                 std::cerr << "RealSense error calling " << e.get_failed_function() << "(" << e.get_failed_args() << "):\n" << e.what() << std::endl;
                 continue;
             }
-            auto end = std::chrono::high_resolution_clock::now();
-            std::chrono::duration<double, std::milli> duration = end - start;
-            // std::cout << "Grab frameset: Elapsed time: " << duration.count() << " ms " << std::endl;
-            
-            auto new_start = std::chrono::high_resolution_clock::now();        
+      
             // for (auto f : aligned_frames)
             // {
             //     rs2::stream_profile profile = f.get_profile();
@@ -93,20 +91,15 @@ int main()
             //     last_ts[profile.stream_type()] = ts;
             // }
 
-            end = std::chrono::high_resolution_clock::now();
-            duration = end - new_start;
-            // std::cout << "Grab timestamps: Elapsed time: " << duration.count() << " ms " << std::endl;
-            
             // fp_ptr->processFrameset(aligned_frames);
 
-
             //Grab the frames
-            new_start = std::chrono::high_resolution_clock::now();
-            rs2::frame accel_frame = aligned_frames.first(RS2_STREAM_ACCEL, RS2_FORMAT_MOTION_XYZ32F);
-            rs2::motion_frame accel = accel_frame.as<rs2::motion_frame>();
-            rs2::frame gyro_frame = aligned_frames.first(RS2_STREAM_GYRO, RS2_FORMAT_MOTION_XYZ32F);
-            rs2::motion_frame gyro = gyro_frame.as<rs2::motion_frame>();
-            double gyro_ts = gyro.get_timestamp();
+            // new_start = std::chrono::high_resolution_clock::now();
+            // rs2::frame accel_frame = aligned_frames.first(RS2_STREAM_ACCEL, RS2_FORMAT_MOTION_XYZ32F);
+            // rs2::motion_frame accel = accel_frame.as<rs2::motion_frame>();
+            // rs2::frame gyro_frame = aligned_frames.first(RS2_STREAM_GYRO, RS2_FORMAT_MOTION_XYZ32F);
+            // rs2::motion_frame gyro = gyro_frame.as<rs2::motion_frame>();
+            // double gyro_ts = gyro.get_timestamp();
 
             // if (gyro)
             // {
@@ -127,10 +120,10 @@ int main()
             // cv::Mat depth_image(cv::Size(640, 480), CV_16UC1, (void*)aligned_depth_frame.get_data(), cv::Mat::AUTO_STEP);
             cv::Mat output_frame;
             // fp_ptr->wrapGoodFeatures(color_image, output_frame);
-            fp_ptr->orbDetectAndCompute(color_image, output_frame);
-            fp_ptr->grabVertices(aligned_depth_frame, points, pc);
-            // TODO: maybe put the if frames > 0 here?
-            fp_ptr->frameMatcher();
+            // fp_ptr->orbDetectAndCompute(color_image, output_frame);
+            // fp_ptr->grabVertices(aligned_depth_frame, points, pc);
+            // // TODO: maybe put the if frames > 0 here?
+            // fp_ptr->frameMatcher();
             
 
 
@@ -138,12 +131,18 @@ int main()
             // run the algorithm in https://arxiv.org/pdf/2203.15119
             // and then we use the translation vector and rotation matrix as our odometry
             cv::imshow(windowName, color_image);
-            // // Output the duration in milliseconds
-            end = std::chrono::high_resolution_clock::now();
-            // duration = end - new_start;
-            std::chrono::duration<double, std::milli> duration_final = end - start;
-            // std::cout << "Process Frames: Elapsed time: " << duration.count() << " ms " << std::endl;
-            std::cout << "Total Elapsed time: " << duration_final.count() << " ms " << std::endl;
+
+
+            std::chrono::duration<double, std::milli> duration = end - start;
+            fps_count++;
+            if(duration.count() > 2000.f)
+            {
+                double duration_hz = static_cast<double>(fps_count) / (duration.count() / 1000.f);
+                std::cout << "Framerate: " << duration_hz << " hz." << std::endl;
+                fps_count = 0; //reset counter
+                start = end; //reset start
+            }
+
             
           
 
