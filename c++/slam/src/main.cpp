@@ -43,8 +43,6 @@ int main()
         //Create a configuration for configuring the pipeline with a non default profile
         rs2::config cfg;
         //May take too long
-        rs2::pointcloud pc;
-        rs2::points points;
         //Add desired streams to configuration
         cfg.enable_stream(RS2_STREAM_ACCEL, RS2_FORMAT_MOTION_XYZ32F);
         cfg.enable_stream(RS2_STREAM_GYRO,  RS2_FORMAT_MOTION_XYZ32F);

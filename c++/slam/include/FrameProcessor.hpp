@@ -24,6 +24,9 @@ class FrameProcessor
         unsigned int m_poolSize;
         std::vector<std::thread> m_pool;
         FrameBuffer<rs2::frameset> m_frameBuffer;
+        
+        rs2::pointcloud pc;
+        rs2::points points;
 
         FrameBuffer<rs2::frame> m_colorFrameBuffer;
         FrameBuffer<rs2::frame> m_depthFrameBuffer;

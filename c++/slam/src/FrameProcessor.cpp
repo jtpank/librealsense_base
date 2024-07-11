@@ -129,6 +129,7 @@ void FrameProcessor::consumeDepthFrame(int threadId)
 {
     rs2::frame depth_frame = m_depthFrameBuffer.pop();
     cv::Mat depth_image(cv::Size(640, 480), CV_16UC1, (void*)depth_frame.get_data(), cv::Mat::AUTO_STEP);
+    grabVertices(depth_frame, m_points, m_pc);
 }
 void FrameProcessor::consumeImuFrame(int threadId)
 {
@@ -249,11 +250,17 @@ void FrameProcessor::orbDetectAndCompute(cv::Mat &inputFrame, cv::Mat &outputFra
     
 }
 
+
+//TODO: dont make these points and pc pass in. They are member variables!
 void FrameProcessor::grabVertices(rs2::depth_frame &depth_frame, rs2::points &points, rs2::pointcloud &pc)
 {
     points = pc.calculate(depth_frame);
     const rs2::vertex* vertices = points.get_vertices();
     m_vertices.push_back(vertices);
+    if(m_vertices.size() > 2)
+    {
+        m_vertices.pop_front();
+    }
 }
 
 void FrameProcessor::frameMatcher()
