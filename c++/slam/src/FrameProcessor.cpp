@@ -120,19 +120,42 @@ void FrameProcessor::framesetConsumer(int threadId)
 
 void FrameProcessor::consumeColorFrame(int threadId)
 {   
+    m_colorCounter++;
     rs2::frame color_frame = m_colorFrameBuffer.pop();
     cv::Mat color_image(cv::Size(640, 480), CV_8UC3, (void*)color_frame.get_data(), cv::Mat::AUTO_STEP);
     cv::Mat output_frame;
     orbDetectAndCompute(color_image, output_frame);
+    if(m_colorCounter % 20 == 0)
+    {
+        m_depthCounter = 0;
+        std::cout << "threadid: " << threadId << " | Orb detect performed" << std::endl;
+    }
+
 }
 void FrameProcessor::consumeDepthFrame(int threadId)
 {
+    m_depthCounter++;
     rs2::frame depth_frame = m_depthFrameBuffer.pop();
     cv::Mat depth_image(cv::Size(640, 480), CV_16UC1, (void*)depth_frame.get_data(), cv::Mat::AUTO_STEP);
-    grabVertices(depth_frame, m_points, m_pc);
+    // TODO: This errors: cannot bind non-const lvalue reference of type ‘rs2::depth_frame&’ to an rvalue of type ‘rs2::depth_frame’
+    // grabVertices(depth_frame, m_points, m_pc);
+    m_points = m_pc.calculate(depth_frame);
+    const rs2::vertex* vertices = m_points.get_vertices();
+    m_vertices.push_back(vertices);
+    if(m_vertices.size() > 2)
+    {
+        m_vertices.pop_front();
+    }
+    if(m_depthCounter % 20 == 0)
+    {
+        m_depthCounter = 0;
+        std::cout << "threadid: " << threadId << " | Vertices found" << std::endl;
+    }
+
 }
 void FrameProcessor::consumeImuFrame(int threadId)
 {
+    m_imuCounter++;
     std::vector<rs2::frame> bothFrames = m_imuFrameBuffer.pop();
     rs2::frame accel_frame = bothFrames[0];
     rs2::frame gyro_frame = bothFrames[1];
@@ -148,6 +171,12 @@ void FrameProcessor::consumeImuFrame(int threadId)
     {
         rs2_vector av = accel.get_motion_data();
         algo.process_accel(av);
+    }
+    if(m_imuCounter % 20 == 0)
+    {
+        m_imuCounter = 0;
+        float3 outputTheta = (algo.get_theta())* 180.0 / M_PI;
+        std::cout << "threadid: " << threadId << " | Pitch: " << outputTheta.x << " Yaw: " << outputTheta.y << " Roll: " << outputTheta.z << std::endl;
     }
     
 }
