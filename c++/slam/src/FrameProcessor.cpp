@@ -120,7 +120,6 @@ void FrameProcessor::framesetConsumer(int threadId)
 
 void FrameProcessor::consumeColorFrame(int threadId)
 {   
-    std::cout << "\tthreadid: " << threadId << std::endl;
     rs2::frame color_frame = m_colorFrameBuffer.pop();
     cv::Mat color_image(cv::Size(640, 480), CV_8UC3, (void*)color_frame.get_data(), cv::Mat::AUTO_STEP);
     cv::Mat output_frame;
@@ -128,13 +127,11 @@ void FrameProcessor::consumeColorFrame(int threadId)
 }
 void FrameProcessor::consumeDepthFrame(int threadId)
 {
-    std::cout << "\tthreadid: " << threadId << std::endl;
     rs2::frame depth_frame = m_depthFrameBuffer.pop();
     cv::Mat depth_image(cv::Size(640, 480), CV_16UC1, (void*)depth_frame.get_data(), cv::Mat::AUTO_STEP);
 }
 void FrameProcessor::consumeImuFrame(int threadId)
 {
-    std::cout << "\tthreadid: " << threadId << std::endl;
     std::vector<rs2::frame> bothFrames = m_imuFrameBuffer.pop();
     rs2::frame accel_frame = bothFrames[0];
     rs2::frame gyro_frame = bothFrames[1];
@@ -166,7 +163,6 @@ void FrameProcessor::joinAllThreads()
 
 void FrameProcessor::processFramesToIndividualBuffers(rs2::frameset& frameSet)
 {
-    std::cout << "Processing frames to individualbuffers: " << std::endl;
     rs2::frame color_frame = frameSet.get_color_frame();
     rs2::depth_frame depth_frame = frameSet.get_depth_frame();
     rs2::frame accel_frame = frameSet.first(RS2_STREAM_ACCEL, RS2_FORMAT_MOTION_XYZ32F);
@@ -177,7 +173,6 @@ void FrameProcessor::processFramesToIndividualBuffers(rs2::frameset& frameSet)
     m_colorFrameBuffer.push(color_frame);
     m_depthFrameBuffer.push(depth_frame);
     m_imuFrameBuffer.push(imuFrames);
-    std::cout << "End processing frames to individualbuffers." << std::endl;
 }
 
 void FrameProcessor::processFrameset(rs2::frameset& frameSet)
