@@ -43,9 +43,9 @@ class FrameProcessor
 
         void processFrameset(rs2::frameset& frameSet);
         void processFramesToIndividualBuffers(rs2::frameset& frameSet);
-        void consumeColorFrame();
-        void consumeDepthFrame();
-        void consumeImuFrame();
+        void consumeColorFrame(int threadId);
+        void consumeDepthFrame(int threadId);
+        void consumeImuFrame(int threadId);
 
         void set_depthScale(float depthScale);
         void wrapGoodFeatures(cv::Mat &inputFrame, cv::Mat &outputFrame);

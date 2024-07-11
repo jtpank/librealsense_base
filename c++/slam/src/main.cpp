@@ -65,7 +65,7 @@ int main()
         double dt[RS2_STREAM_COUNT];
         const int THREAD_COUNT = 3; //depth, color, imu
         std::unique_ptr<FrameProcessor> fp_ptr = std::make_unique<FrameProcessor>(THREAD_COUNT);
-        RotationEstimator algo;
+        // RotationEstimator algo;
 
         int fps_count = 0;
         auto start = std::chrono::high_resolution_clock::now();

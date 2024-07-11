@@ -14,6 +14,7 @@ m_hasFirstFrame(false),  m_shutdownThreads(false)
         m_pool.emplace_back(std::thread( [=]() { frameConsumer(0, colorFrameType); }));
         m_pool.emplace_back(std::thread( [=]() { frameConsumer(1, depthFrameType); }));
         m_pool.emplace_back(std::thread( [=]() { frameConsumer(2, imuFrameType); }));
+        std::cout << "\tFinished setting up thread pool." << std::endl;
     } catch (const std::exception& e) {
         std::cerr << "Exception during thread creation: " << e.what() << std::endl;
         throw;
@@ -30,17 +31,17 @@ void FrameProcessor::frameConsumer(int threadId, FrameBufferType ftype)
             {
                 case colorFrameType:
                 {
-                    this->consumeColorFrame();
+                    this->consumeColorFrame(threadId);
                     break;
                 }
                 case depthFrameType:
                 {
-                    this->consumeDepthFrame();
+                    this->consumeDepthFrame(threadId);
                     break;
                 }
                 case imuFrameType:
                 {
-                    this->consumeImuFrame();
+                    this->consumeImuFrame(threadId);
                     break;
                 }
                 default:
@@ -117,8 +118,9 @@ void FrameProcessor::framesetConsumer(int threadId)
     }
 }
 
-void FrameProcessor::consumeColorFrame()
-{
+void FrameProcessor::consumeColorFrame(int threadId)
+{   
+    std::cout << "\tthreadid: " << threadId << std::endl;
     rs2::frame color_frame = m_colorFrameBuffer.pop();
     while(true && !this->m_shutdownThreads)
     {
@@ -127,16 +129,18 @@ void FrameProcessor::consumeColorFrame()
         orbDetectAndCompute(color_image, output_frame);
     }
 }
-void FrameProcessor::consumeDepthFrame()
+void FrameProcessor::consumeDepthFrame(int threadId)
 {
+    std::cout << "\tthreadid: " << threadId << std::endl;
     rs2::frame depth_frame = m_depthFrameBuffer.pop();
     while(true && !this->m_shutdownThreads)
     {
         cv::Mat depth_image(cv::Size(640, 480), CV_16UC1, (void*)depth_frame.get_data(), cv::Mat::AUTO_STEP);
     }
 }
-void FrameProcessor::consumeImuFrame()
+void FrameProcessor::consumeImuFrame(int threadId)
 {
+    std::cout << "\tthreadid: " << threadId << std::endl;
     while(true && !this->m_shutdownThreads)
     {
         std::vector<rs2::frame> bothFrames = m_imuFrameBuffer.pop();
