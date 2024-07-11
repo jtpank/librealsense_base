@@ -54,6 +54,9 @@ int main()
         
         //Very important for aligning frames
         rs2::align align(RS2_STREAM_COLOR);
+        rs2::pointcloud pc;
+        rs2::points points;
+        RotationEstimator algo;
         //Display time
         const auto windowName = "Depth and Color Images";
         cv::namedWindow(windowName, cv::WINDOW_AUTOSIZE);
@@ -63,7 +66,7 @@ int main()
         double dt[RS2_STREAM_COUNT];
         const int THREAD_COUNT = 3; //depth, color, imu
         std::unique_ptr<FrameProcessor> fp_ptr = std::make_unique<FrameProcessor>(THREAD_COUNT);
-        // RotationEstimator algo;
+        
 
         int fps_count = 0;
         auto start = std::chrono::high_resolution_clock::now();
@@ -81,36 +84,36 @@ int main()
                 std::cerr << "RealSense error calling " << e.get_failed_function() << "(" << e.get_failed_args() << "):\n" << e.what() << std::endl;
                 continue;
             }
-            fp_ptr->processFramesToIndividualBuffers(aligned_frames);
+            // fp_ptr->processFramesToIndividualBuffers(aligned_frames);
             // fp_ptr->processFrameset(aligned_frames);
 
             //Grab the frames
-            // rs2::frame accel_frame = aligned_frames.first(RS2_STREAM_ACCEL, RS2_FORMAT_MOTION_XYZ32F);
-            // rs2::motion_frame accel = accel_frame.as<rs2::motion_frame>();
-            // rs2::frame gyro_frame = aligned_frames.first(RS2_STREAM_GYRO, RS2_FORMAT_MOTION_XYZ32F);
-            // rs2::motion_frame gyro = gyro_frame.as<rs2::motion_frame>();
-            // double gyro_ts = gyro.get_timestamp();
+            rs2::frame accel_frame = aligned_frames.first(RS2_STREAM_ACCEL, RS2_FORMAT_MOTION_XYZ32F);
+            rs2::motion_frame accel = accel_frame.as<rs2::motion_frame>();
+            rs2::frame gyro_frame = aligned_frames.first(RS2_STREAM_GYRO, RS2_FORMAT_MOTION_XYZ32F);
+            rs2::motion_frame gyro = gyro_frame.as<rs2::motion_frame>();
+            double gyro_ts = gyro.get_timestamp();
 
-            // if (gyro)
-            // {
-            //     rs2_vector gv = gyro.get_motion_data();
-            //     algo.process_gyro(gv, gyro_ts);
-            // }
-            // if (accel)
-            // {
-            //     rs2_vector av = accel.get_motion_data();
-            //     algo.process_accel(av);
-            // }
-            // float3 outputTheta = (algo.get_theta())* 180.0 / M_PI;
-            // // std::cout << "Pitch: " << outputTheta.x << " Yaw: " << outputTheta.y << " Roll: " << outputTheta.z << std::endl;
+            if (gyro)
+            {
+                rs2_vector gv = gyro.get_motion_data();
+                algo.process_gyro(gv, gyro_ts);
+            }
+            if (accel)
+            {
+                rs2_vector av = accel.get_motion_data();
+                algo.process_accel(av);
+            }
+            float3 outputTheta = (algo.get_theta())* 180.0 / M_PI;
+            // std::cout << "Pitch: " << outputTheta.x << " Yaw: " << outputTheta.y << " Roll: " << outputTheta.z << std::endl;
 
-            // rs2::frame color_frame = aligned_frames.get_color_frame();
-            // rs2::depth_frame aligned_depth_frame = aligned_frames.get_depth_frame();
-            // cv::Mat color_image(cv::Size(640, 480), CV_8UC3, (void*)color_frame.get_data(), cv::Mat::AUTO_STEP);
-            // cv::Mat depth_image(cv::Size(640, 480), CV_16UC1, (void*)aligned_depth_frame.get_data(), cv::Mat::AUTO_STEP);
-            // cv::Mat output_frame;
-            // fp_ptr->orbDetectAndCompute(color_image, output_frame);
-            // fp_ptr->grabVertices(aligned_depth_frame, points, pc);
+            rs2::frame color_frame = aligned_frames.get_color_frame();
+            rs2::depth_frame aligned_depth_frame = aligned_frames.get_depth_frame();
+            cv::Mat color_image(cv::Size(640, 480), CV_8UC3, (void*)color_frame.get_data(), cv::Mat::AUTO_STEP);
+            cv::Mat depth_image(cv::Size(640, 480), CV_16UC1, (void*)aligned_depth_frame.get_data(), cv::Mat::AUTO_STEP);
+            cv::Mat output_frame;
+            fp_ptr->orbDetectAndCompute(color_image, output_frame);
+            fp_ptr->grabVertices(aligned_depth_frame, points, pc);
             // // TODO: maybe put the if frames > 0 here?
             // fp_ptr->frameMatcher();
             
