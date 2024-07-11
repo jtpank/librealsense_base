@@ -122,44 +122,36 @@ void FrameProcessor::consumeColorFrame(int threadId)
 {   
     std::cout << "\tthreadid: " << threadId << std::endl;
     rs2::frame color_frame = m_colorFrameBuffer.pop();
-    while(true && !this->m_shutdownThreads)
-    {
-        cv::Mat color_image(cv::Size(640, 480), CV_8UC3, (void*)color_frame.get_data(), cv::Mat::AUTO_STEP);
-        cv::Mat output_frame;
-        orbDetectAndCompute(color_image, output_frame);
-    }
+    cv::Mat color_image(cv::Size(640, 480), CV_8UC3, (void*)color_frame.get_data(), cv::Mat::AUTO_STEP);
+    cv::Mat output_frame;
+    orbDetectAndCompute(color_image, output_frame);
 }
 void FrameProcessor::consumeDepthFrame(int threadId)
 {
     std::cout << "\tthreadid: " << threadId << std::endl;
     rs2::frame depth_frame = m_depthFrameBuffer.pop();
-    while(true && !this->m_shutdownThreads)
-    {
-        cv::Mat depth_image(cv::Size(640, 480), CV_16UC1, (void*)depth_frame.get_data(), cv::Mat::AUTO_STEP);
-    }
+    cv::Mat depth_image(cv::Size(640, 480), CV_16UC1, (void*)depth_frame.get_data(), cv::Mat::AUTO_STEP);
 }
 void FrameProcessor::consumeImuFrame(int threadId)
 {
     std::cout << "\tthreadid: " << threadId << std::endl;
-    while(true && !this->m_shutdownThreads)
+    std::vector<rs2::frame> bothFrames = m_imuFrameBuffer.pop();
+    rs2::frame accel_frame = bothFrames[0];
+    rs2::frame gyro_frame = bothFrames[1];
+    rs2::motion_frame accel = accel_frame.as<rs2::motion_frame>();
+    rs2::motion_frame gyro = gyro_frame.as<rs2::motion_frame>();
+    double gyro_ts = gyro.get_timestamp();
+    if (gyro)
     {
-        std::vector<rs2::frame> bothFrames = m_imuFrameBuffer.pop();
-        rs2::frame accel_frame = bothFrames[0];
-        rs2::frame gyro_frame = bothFrames[1];
-        rs2::motion_frame accel = accel_frame.as<rs2::motion_frame>();
-        rs2::motion_frame gyro = gyro_frame.as<rs2::motion_frame>();
-        double gyro_ts = gyro.get_timestamp();
-        if (gyro)
-        {
-            rs2_vector gv = gyro.get_motion_data();
-            algo.process_gyro(gv, gyro_ts);
-        }
-        if (accel)
-        {
-            rs2_vector av = accel.get_motion_data();
-            algo.process_accel(av);
-        }
+        rs2_vector gv = gyro.get_motion_data();
+        algo.process_gyro(gv, gyro_ts);
     }
+    if (accel)
+    {
+        rs2_vector av = accel.get_motion_data();
+        algo.process_accel(av);
+    }
+    
 }
 
 void FrameProcessor::joinAllThreads()
