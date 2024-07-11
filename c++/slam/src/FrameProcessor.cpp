@@ -388,8 +388,8 @@ void FrameProcessor::frameMatcher()
         assert(covMat.rows == covMat.cols);
         assert(covMat.rows == 3);
         //4. perform SVD.
-        cv::Mat_<double> w, u, vt;
-        cv::SVDecomp(covMat,w, u, vt);
+        // cv::Mat_<double> w, u, vt;
+        // cv::SVDecomp(covMat,w, u, vt);
         m_matcherCounter++;
         if(m_matcherCounter % 20 == 0)
         {
