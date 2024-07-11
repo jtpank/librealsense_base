@@ -4,6 +4,13 @@
 #include <deque>
 //Thread safe, FIFO, for frame buffer
 
+enum FrameBufferType {
+    frameSetType    = 0,
+    colorFrameType  = 1,
+    depthFrameType  = 2,
+    imuFrameType    = 3,
+};
+
 template <typename T>
 class FrameBuffer
 {
@@ -12,8 +19,9 @@ class FrameBuffer
         std::mutex m_mutex;
         std::condition_variable m_cv;
         std::deque<T> m_buffer;
+        FrameBufferType m_fbType;
     public:
-        FrameBuffer(unsigned int sz): m_size(sz) {}
+        FrameBuffer(unsigned int sz, FrameBufferType fpType): m_size(sz), m_fbType(fpType) {}
         void push(T data) {
             std::unique_lock<std::mutex> u_lock(m_mutex);
             m_cv.wait(u_lock, [this]() { return m_buffer.size() < m_size; });

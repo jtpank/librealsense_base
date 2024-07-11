@@ -2,24 +2,60 @@
 
 FrameProcessor::FrameProcessor(unsigned int poolSize) 
 : m_pOrb(cv::ORB::create()), m_bfMatcher(cv::BFMatcher::create(cv::NORM_HAMMING)),
-m_poolSize(poolSize), m_frameBuffer(poolSize), m_hasFirstFrame(false),  m_shutdownThreads(false)
+m_poolSize(poolSize), m_frameBuffer(poolSize, frameSetType), m_colorFrameBuffer(poolSize, colorFrameType), 
+m_depthFrameBuffer(poolSize, depthFrameType), m_imuFrameBuffer(poolSize, imuFrameType),
+m_hasFirstFrame(false),  m_shutdownThreads(false)
 {   
     std::cout << "\nSetting up thread pool: " << std::endl;
     m_poolSize = poolSize;
-    for(auto i = 0; i < poolSize; ++i)
+
+    try {
+        //Push back 3 threads for each frame
+        m_pool.emplace_back(std::thread( [=]() { frameConsumer(0, colorFrameType); }));
+        m_pool.emplace_back(std::thread( [=]() { frameConsumer(1, depthFrameType); }));
+        m_pool.emplace_back(std::thread( [=]() { frameConsumer(2, imuFrameType); }));
+    } catch (const std::exception& e) {
+        std::cerr << "Exception during thread creation: " << e.what() << std::endl;
+        throw;
+    }
+    
+}
+
+void FrameProcessor::frameConsumer(int threadId, FrameBufferType ftype)
+{
+    while(true && !this->m_shutdownThreads)
     {
-        //this leads to terminate called without an active exception
-        // Aborted (core dumped)
         try {
-             m_pool.emplace_back(std::thread( [=]() { frameConsumer(i); }));
-        } catch (const std::exception& e) {
-            std::cerr << "Exception during thread creation: " << e.what() << std::endl;
-            throw;
+            switch(ftype)
+            {
+                case colorFrameType:
+                {
+                    this->consumeColorFrame();
+                    break;
+                }
+                case depthFrameType:
+                {
+                    this->consumeDepthFrame();
+                    break;
+                }
+                case imuFrameType:
+                {
+                    this->consumeImuFrame();
+                    break;
+                }
+                default:
+                {
+                    break;
+                }
+            }
+        }
+        catch(const std::runtime_error &e){
         }
     }
 }
 
-void FrameProcessor::frameConsumer(int threadId)
+
+void FrameProcessor::framesetConsumer(int threadId)
 {
     while(true && !this->m_shutdownThreads)
     {
@@ -81,6 +117,47 @@ void FrameProcessor::frameConsumer(int threadId)
     }
 }
 
+void FrameProcessor::consumeColorFrame()
+{
+    rs2::frame color_frame = m_colorFrameBuffer.pop();
+    while(true && !this->m_shutdownThreads)
+    {
+        cv::Mat color_image(cv::Size(640, 480), CV_8UC3, (void*)color_frame.get_data(), cv::Mat::AUTO_STEP);
+        cv::Mat output_frame;
+        orbDetectAndCompute(color_image, output_frame);
+    }
+}
+void FrameProcessor::consumeDepthFrame()
+{
+    rs2::frame depth_frame = m_depthFrameBuffer.pop();
+    while(true && !this->m_shutdownThreads)
+    {
+        cv::Mat depth_image(cv::Size(640, 480), CV_16UC1, (void*)depth_frame.get_data(), cv::Mat::AUTO_STEP);
+    }
+}
+void FrameProcessor::consumeImuFrame()
+{
+    while(true && !this->m_shutdownThreads)
+    {
+        std::vector<rs2::frame> bothFrames = m_imuFrameBuffer.pop();
+        rs2::frame accel_frame = bothFrames[0];
+        rs2::frame gyro_frame = bothFrames[1];
+        rs2::motion_frame accel = accel_frame.as<rs2::motion_frame>();
+        rs2::motion_frame gyro = gyro_frame.as<rs2::motion_frame>();
+        double gyro_ts = gyro.get_timestamp();
+        if (gyro)
+        {
+            rs2_vector gv = gyro.get_motion_data();
+            algo.process_gyro(gv, gyro_ts);
+        }
+        if (accel)
+        {
+            rs2_vector av = accel.get_motion_data();
+            algo.process_accel(av);
+        }
+    }
+}
+
 void FrameProcessor::joinAllThreads()
 {
     this->m_shutdownThreads = false;
@@ -89,6 +166,20 @@ void FrameProcessor::joinAllThreads()
         th.join();
     }
     std::cout << "Finished joining all threads." << std::endl;
+}
+
+void FrameProcessor::processFramesToIndividualBuffers(rs2::frameset& frameSet)
+{
+    rs2::frame color_frame = frameSet.get_color_frame();
+    rs2::depth_frame depth_frame = frameSet.get_depth_frame();
+    rs2::frame accel_frame = frameSet.first(RS2_STREAM_ACCEL, RS2_FORMAT_MOTION_XYZ32F);
+    rs2::frame gyro_frame = frameSet.first(RS2_STREAM_GYRO, RS2_FORMAT_MOTION_XYZ32F);
+    std::vector<rs2::frame> imuFrames;
+    imuFrames.emplace_back(accel_frame);
+    imuFrames.emplace_back(gyro_frame);
+    m_colorFrameBuffer.push(color_frame);
+    m_depthFrameBuffer.push(depth_frame);
+    m_imuFrameBuffer.push(imuFrames);
 }
 
 void FrameProcessor::processFrameset(rs2::frameset& frameSet)

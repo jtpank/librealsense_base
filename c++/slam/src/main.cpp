@@ -63,7 +63,8 @@ int main()
         //For gyro and accel pose
         double last_ts[RS2_STREAM_COUNT];
         double dt[RS2_STREAM_COUNT];
-        std::unique_ptr<FrameProcessor> fp_ptr = std::make_unique<FrameProcessor>(n_threads);
+        const int THREAD_COUNT = 3; //depth, color, imu
+        std::unique_ptr<FrameProcessor> fp_ptr = std::make_unique<FrameProcessor>(THREAD_COUNT);
         RotationEstimator algo;
 
         int fps_count = 0;
@@ -81,8 +82,8 @@ int main()
                 std::cerr << "RealSense error calling " << e.get_failed_function() << "(" << e.get_failed_args() << "):\n" << e.what() << std::endl;
                 continue;
             }
-    
-            fp_ptr->processFrameset(aligned_frames);
+            fp_ptr->processFramesToIndividualBuffers(aligned_frames);
+            // fp_ptr->processFrameset(aligned_frames);
 
             //Grab the frames
             // rs2::frame accel_frame = aligned_frames.first(RS2_STREAM_ACCEL, RS2_FORMAT_MOTION_XYZ32F);

@@ -7,6 +7,7 @@
 #include <librealsense2/rs.hpp> 
 #include "FrameBuffer.hpp"
 #include "float3.hpp"
+#include "RotationEstimator.hpp"
 #include <iostream>
 #include <thread>
 #include <vector>
@@ -23,15 +24,29 @@ class FrameProcessor
         unsigned int m_poolSize;
         std::vector<std::thread> m_pool;
         FrameBuffer<rs2::frameset> m_frameBuffer;
+
+        FrameBuffer<rs2::frame> m_colorFrameBuffer;
+        FrameBuffer<rs2::frame> m_depthFrameBuffer;
+        FrameBuffer<std::vector<rs2::frame>> m_imuFrameBuffer;
+
         bool m_hasFirstFrame;
         std::deque<std::vector<cv::KeyPoint>> m_kps;
         std::deque<const rs2::vertex*> m_vertices;
         std::deque<cv::Mat> m_des;
         bool m_shutdownThreads;
+
+        RotationEstimator algo;
     public:
         FrameProcessor(unsigned int poolSize);
-        void frameConsumer(int threadId);
+        void frameConsumer(int threadId, FrameBufferType ftype);
+        void framesetConsumer(int threadId);
+
         void processFrameset(rs2::frameset& frameSet);
+        void processFramesToIndividualBuffers(rs2::frameset& frameSet);
+        void consumeColorFrame();
+        void consumeDepthFrame();
+        void consumeImuFrame();
+
         void set_depthScale(float depthScale);
         void wrapGoodFeatures(cv::Mat &inputFrame, cv::Mat &outputFrame);
         void orbDetectAndCompute(cv::Mat &inputFrame, cv::Mat &outputFrame);
