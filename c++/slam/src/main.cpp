@@ -29,7 +29,8 @@ int main(int argc, char** argv)
     int DO_THREADING = 0;
     if (argc > 1) {
         // argv[1] contains the first argument
-        std::cout << "First argument: " << argv[1] << std::endl;
+        std::cout << "First argument DO_THREADING: " << argv[1] << std::endl;
+        std::cout << "0 is NO THREADING, 1 is THREADING (thread pool sets up regardless)" << std::endl;
         DO_THREADING = *argv[1] - '0';
     } else {
         std::cout << "No arguments provided." << std::endl;
