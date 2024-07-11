@@ -337,7 +337,7 @@ void FrameProcessor::frameMatcher()
         m_vertices.pop_front();
         assert(good_srcPoints.size() == good_dstPoints.size());
         assert(good_matches.size() == good_srcPoints.size());
-        std::cout << "size: " << good_srcPoints.size() << std::endl;
+        
 
         //1. compute the centroids
         float3 good_srcCentroid, good_dstCentroid;
@@ -358,6 +358,7 @@ void FrameProcessor::frameMatcher()
         if(m_matcherCounter % 20 == 0)
         {
             m_matcherCounter = 0;
+            std::cout << "size: " << good_srcPoints.size() << std::endl;
             std::cout << "good_srcCentroid: x,y,z: " << good_srcCentroid.x << "," << good_srcCentroid.y << "," << good_srcCentroid.z << std::endl;
             std::cout << "good_dstCentroid: x,y,z: " << good_dstCentroid.x << "," << good_dstCentroid.y << "," << good_dstCentroid.z << std::endl;  
         }
