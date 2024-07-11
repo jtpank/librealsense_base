@@ -129,7 +129,7 @@ void FrameProcessor::consumeDepthFrame(int threadId)
 {
     rs2::frame depth_frame = m_depthFrameBuffer.pop();
     cv::Mat depth_image(cv::Size(640, 480), CV_16UC1, (void*)depth_frame.get_data(), cv::Mat::AUTO_STEP);
-    grabVertices(depth_frame.keep(), m_points, m_pc);
+    grabVertices(depth_frame, m_points, m_pc);
 }
 void FrameProcessor::consumeImuFrame(int threadId)
 {
@@ -164,6 +164,7 @@ void FrameProcessor::joinAllThreads()
 
 void FrameProcessor::processFramesToIndividualBuffers(rs2::frameset& frameSet)
 {
+    frameSet.keep();
     rs2::frame color_frame = frameSet.get_color_frame();
     rs2::depth_frame depth_frame = frameSet.get_depth_frame();
     rs2::frame accel_frame = frameSet.first(RS2_STREAM_ACCEL, RS2_FORMAT_MOTION_XYZ32F);
