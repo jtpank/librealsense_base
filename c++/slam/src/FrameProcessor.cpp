@@ -2,7 +2,7 @@
 
 FrameProcessor::FrameProcessor(unsigned int poolSize) 
 : m_pOrb(cv::ORB::create()), m_bfMatcher(cv::BFMatcher::create(cv::NORM_HAMMING)),
-m_poolSize(poolSize), m_frameBuffer(poolSize), m_hasFirstFrame(false)
+m_poolSize(poolSize), m_frameBuffer(poolSize), m_hasFirstFrame(false),  m_shutdownThreads(false)
 {   
     std::cout << "\nSetting up thread pool: " << std::endl;
     m_poolSize = poolSize;
@@ -21,7 +21,7 @@ m_poolSize(poolSize), m_frameBuffer(poolSize), m_hasFirstFrame(false)
 
 void FrameProcessor::frameConsumer(int threadId)
 {
-    while(true)
+    while(true && !this->m_shutdownThreads)
     {
         try{
             rs2::frameset aligned_frames = m_frameBuffer.pop();
@@ -79,6 +79,16 @@ void FrameProcessor::frameConsumer(int threadId)
         catch(const std::runtime_error &e){
         }
     }
+}
+
+void FrameProcessor::joinAllThreads()
+{
+    this->m_shutdownThreads = false;
+    for(auto &th : m_pool)
+    {
+        th.join();
+    }
+    std::cout << "Finished joining all threads." << std::endl;
 }
 
 void FrameProcessor::processFrameset(rs2::frameset& frameSet)

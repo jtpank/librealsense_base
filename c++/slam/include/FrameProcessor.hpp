@@ -27,6 +27,7 @@ class FrameProcessor
         std::deque<std::vector<cv::KeyPoint>> m_kps;
         std::deque<const rs2::vertex*> m_vertices;
         std::deque<cv::Mat> m_des;
+        bool m_shutdownThreads;
     public:
         FrameProcessor(unsigned int poolSize);
         void frameConsumer(int threadId);
@@ -38,4 +39,5 @@ class FrameProcessor
         void frameMatcher();
         void poseFromHomography(cv::Mat &H);
         void test_wrapGoodFeatures();
+        void joinAllThreads();
 };

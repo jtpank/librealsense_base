@@ -81,17 +81,8 @@ int main()
                 std::cerr << "RealSense error calling " << e.get_failed_function() << "(" << e.get_failed_args() << "):\n" << e.what() << std::endl;
                 continue;
             }
-      
-            // for (auto f : aligned_frames)
-            // {
-            //     rs2::stream_profile profile = f.get_profile();
-            //     unsigned long fnum = f.get_frame_number();
-            //     double ts = f.get_timestamp();
-            //     dt[profile.stream_type()] = (ts - last_ts[profile.stream_type()] ) / 1000.0;
-            //     last_ts[profile.stream_type()] = ts;
-            // }
-
-            // fp_ptr->processFrameset(aligned_frames);
+    
+            fp_ptr->processFrameset(aligned_frames);
 
             //Grab the frames
             // rs2::frame accel_frame = aligned_frames.first(RS2_STREAM_ACCEL, RS2_FORMAT_MOTION_XYZ32F);
@@ -113,12 +104,12 @@ int main()
             // float3 outputTheta = (algo.get_theta())* 180.0 / M_PI;
             // // std::cout << "Pitch: " << outputTheta.x << " Yaw: " << outputTheta.y << " Roll: " << outputTheta.z << std::endl;
 
-            rs2::frame color_frame = aligned_frames.get_color_frame();
-            rs2::depth_frame aligned_depth_frame = aligned_frames.get_depth_frame();
-            cv::Mat color_image(cv::Size(640, 480), CV_8UC3, (void*)color_frame.get_data(), cv::Mat::AUTO_STEP);
-            cv::Mat depth_image(cv::Size(640, 480), CV_16UC1, (void*)aligned_depth_frame.get_data(), cv::Mat::AUTO_STEP);
-            cv::Mat output_frame;
-            fp_ptr->orbDetectAndCompute(color_image, output_frame);
+            // rs2::frame color_frame = aligned_frames.get_color_frame();
+            // rs2::depth_frame aligned_depth_frame = aligned_frames.get_depth_frame();
+            // cv::Mat color_image(cv::Size(640, 480), CV_8UC3, (void*)color_frame.get_data(), cv::Mat::AUTO_STEP);
+            // cv::Mat depth_image(cv::Size(640, 480), CV_16UC1, (void*)aligned_depth_frame.get_data(), cv::Mat::AUTO_STEP);
+            // cv::Mat output_frame;
+            // fp_ptr->orbDetectAndCompute(color_image, output_frame);
             // fp_ptr->grabVertices(aligned_depth_frame, points, pc);
             // // TODO: maybe put the if frames > 0 here?
             // fp_ptr->frameMatcher();
@@ -140,11 +131,12 @@ int main()
                 fps_count = 0; //reset counter
                 start = end; //reset start
             }
-
-            
-          
-
         }
+
+        fp_ptr->joinAllThreads();
+        // colorThread.join();
+        // depthThread.join();
+        // imuThread.join();
     }
     catch (const rs2::error & e)
     {
