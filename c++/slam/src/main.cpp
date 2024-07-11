@@ -23,9 +23,18 @@ using namespace std;
 // +z is into the camer
 
 
-int main()
+int main(int argc, char** argv)
 {
     //Number of threads that can execute simultaneously
+    int DO_THREADING = 0;
+    if (argc > 1) {
+        // argv[1] contains the first argument
+        std::cout << "First argument: " << argv[1] << std::endl;
+        DO_THREADING = *argv[1] - '0';
+    } else {
+        std::cout << "No arguments provided." << std::endl;
+    }
+
     unsigned int n_threads = std::thread::hardware_concurrency();
     std::cout << n_threads << " concurrent threads supported." << std::endl;
     //Testing fp_ptr
@@ -84,46 +93,50 @@ int main()
                 std::cerr << "RealSense error calling " << e.get_failed_function() << "(" << e.get_failed_args() << "):\n" << e.what() << std::endl;
                 continue;
             }
-            // fp_ptr->processFramesToIndividualBuffers(aligned_frames);
+            if(DO_THREADING)
+            {
+                fp_ptr->processFramesToIndividualBuffers(aligned_frames);
             // fp_ptr->processFrameset(aligned_frames);
-
+            }
             //Grab the frames
-            rs2::frame accel_frame = aligned_frames.first(RS2_STREAM_ACCEL, RS2_FORMAT_MOTION_XYZ32F);
-            rs2::motion_frame accel = accel_frame.as<rs2::motion_frame>();
-            rs2::frame gyro_frame = aligned_frames.first(RS2_STREAM_GYRO, RS2_FORMAT_MOTION_XYZ32F);
-            rs2::motion_frame gyro = gyro_frame.as<rs2::motion_frame>();
-            double gyro_ts = gyro.get_timestamp();
-
-            if (gyro)
+            else
             {
-                rs2_vector gv = gyro.get_motion_data();
-                algo.process_gyro(gv, gyro_ts);
+                rs2::frame accel_frame = aligned_frames.first(RS2_STREAM_ACCEL, RS2_FORMAT_MOTION_XYZ32F);
+                rs2::motion_frame accel = accel_frame.as<rs2::motion_frame>();
+                rs2::frame gyro_frame = aligned_frames.first(RS2_STREAM_GYRO, RS2_FORMAT_MOTION_XYZ32F);
+                rs2::motion_frame gyro = gyro_frame.as<rs2::motion_frame>();
+                double gyro_ts = gyro.get_timestamp();
+
+                if (gyro)
+                {
+                    rs2_vector gv = gyro.get_motion_data();
+                    algo.process_gyro(gv, gyro_ts);
+                }
+                if (accel)
+                {
+                    rs2_vector av = accel.get_motion_data();
+                    algo.process_accel(av);
+                }
+                float3 outputTheta = (algo.get_theta())* 180.0 / M_PI;
+                // std::cout << "Pitch: " << outputTheta.x << " Yaw: " << outputTheta.y << " Roll: " << outputTheta.z << std::endl;
+
+                rs2::frame color_frame = aligned_frames.get_color_frame();
+                rs2::depth_frame aligned_depth_frame = aligned_frames.get_depth_frame();
+                cv::Mat color_image(cv::Size(640, 480), CV_8UC3, (void*)color_frame.get_data(), cv::Mat::AUTO_STEP);
+                cv::Mat depth_image(cv::Size(640, 480), CV_16UC1, (void*)aligned_depth_frame.get_data(), cv::Mat::AUTO_STEP);
+                cv::Mat output_frame;
+                fp_ptr->orbDetectAndCompute(color_image, output_frame);
+                fp_ptr->grabVertices(aligned_depth_frame, points, pc);
+                // // TODO: maybe put the if frames > 0 here?
+                fp_ptr->frameMatcher();
+                
+
+
+                //grab the xyz point set found from framematcher
+                // run the algorithm in https://arxiv.org/pdf/2203.15119
+                // and then we use the translation vector and rotation matrix as our odometry
+                // cv::imshow(windowName, color_image);
             }
-            if (accel)
-            {
-                rs2_vector av = accel.get_motion_data();
-                algo.process_accel(av);
-            }
-            float3 outputTheta = (algo.get_theta())* 180.0 / M_PI;
-            // std::cout << "Pitch: " << outputTheta.x << " Yaw: " << outputTheta.y << " Roll: " << outputTheta.z << std::endl;
-
-            rs2::frame color_frame = aligned_frames.get_color_frame();
-            rs2::depth_frame aligned_depth_frame = aligned_frames.get_depth_frame();
-            cv::Mat color_image(cv::Size(640, 480), CV_8UC3, (void*)color_frame.get_data(), cv::Mat::AUTO_STEP);
-            cv::Mat depth_image(cv::Size(640, 480), CV_16UC1, (void*)aligned_depth_frame.get_data(), cv::Mat::AUTO_STEP);
-            cv::Mat output_frame;
-            fp_ptr->orbDetectAndCompute(color_image, output_frame);
-            fp_ptr->grabVertices(aligned_depth_frame, points, pc);
-            // // TODO: maybe put the if frames > 0 here?
-            fp_ptr->frameMatcher();
-            
-
-
-            //grab the xyz point set found from framematcher
-            // run the algorithm in https://arxiv.org/pdf/2203.15119
-            // and then we use the translation vector and rotation matrix as our odometry
-            // cv::imshow(windowName, color_image);
-
 
             std::chrono::duration<double, std::milli> duration = end - start;
             fps_count++;
