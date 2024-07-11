@@ -70,6 +70,7 @@ int main()
         int fps_count = 0;
         auto start = std::chrono::high_resolution_clock::now();
 
+        std::cout << "Entering while loop..." << std::endl;
         while(cv::waitKey(1) < 0 && cv::getWindowProperty(windowName, cv::WND_PROP_AUTOSIZE) >= 0)
         {
             auto end = std::chrono::high_resolution_clock::now();

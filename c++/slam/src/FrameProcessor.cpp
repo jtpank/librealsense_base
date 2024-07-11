@@ -174,6 +174,7 @@ void FrameProcessor::joinAllThreads()
 
 void FrameProcessor::processFramesToIndividualBuffers(rs2::frameset& frameSet)
 {
+    std::cout << "Processing frames to individualbuffers: " << std::endl;
     rs2::frame color_frame = frameSet.get_color_frame();
     rs2::depth_frame depth_frame = frameSet.get_depth_frame();
     rs2::frame accel_frame = frameSet.first(RS2_STREAM_ACCEL, RS2_FORMAT_MOTION_XYZ32F);
@@ -184,6 +185,7 @@ void FrameProcessor::processFramesToIndividualBuffers(rs2::frameset& frameSet)
     m_colorFrameBuffer.push(color_frame);
     m_depthFrameBuffer.push(depth_frame);
     m_imuFrameBuffer.push(imuFrames);
+    std::cout << "End processing frames to individualbuffers." << std::endl;
 }
 
 void FrameProcessor::processFrameset(rs2::frameset& frameSet)
