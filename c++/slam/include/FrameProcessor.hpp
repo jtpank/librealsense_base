@@ -31,9 +31,11 @@ class FrameProcessor
         FrameBuffer<rs2::frame> m_colorFrameBuffer;
         FrameBuffer<rs2::frame> m_depthFrameBuffer;
         FrameBuffer<std::vector<rs2::frame>> m_imuFrameBuffer;
-        int m_colorCounter;
-        int m_depthCounter;
-        int m_imuCounter;
+        int m_colorCounter = 0;
+        int m_depthCounter = 0;
+        int m_imuCounter = 0;
+
+        int m_matcherCounter = 0;
 
         bool m_hasFirstFrame;
         std::deque<std::vector<cv::KeyPoint>> m_kps;

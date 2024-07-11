@@ -115,7 +115,7 @@ int main()
             fp_ptr->orbDetectAndCompute(color_image, output_frame);
             fp_ptr->grabVertices(aligned_depth_frame, points, pc);
             // // TODO: maybe put the if frames > 0 here?
-            // fp_ptr->frameMatcher();
+            fp_ptr->frameMatcher();
             
 
 
