@@ -359,7 +359,8 @@ void FrameProcessor::frameMatcher()
         q_centroid.x /= static_cast<float>(sz_n);
         q_centroid.y /= static_cast<float>(sz_n);
         q_centroid.z /= static_cast<float>(sz_n);
-
+        cv::Mat p_centMat = (cv::Mat_<float>(3,1) << p_centroid.x, p_centroid.y, p_centroid.z);
+        cv::Mat q_centMat = (cv::Mat_<float>(3,1) << q_centroid.x, q_centroid.y, q_centroid.z);
         std::vector<cv::Point3f> vp, vq;
         for(int i = 0; i < sz_n; ++i)
         {
@@ -376,34 +377,55 @@ void FrameProcessor::frameMatcher()
             vq.emplace_back(tempq);
         }
         // //3. find covariance matrix S
-        // cv::Mat mat_vp, mat_vq;
-        // for(int i = 0; i < sz_n; ++i)
-        // {
-        //     cv::Mat tempvp = (cv::Mat_<float>(3,1) << vp[i].x, vp[i].y, vp[i].z);
-        //     cv::Mat tempvq = (cv::Mat_<float>(1,3) << vq[i].x, vq[i].y, vq[i].z);
-        //     cv::vconcat(mat_vp, tempvp, mat_vp);
-        //     cv::hconcat(mat_vq, tempvq, mat_vq);
-        // }
+        cv::Mat mat_vp, mat_vq;
+        for(int i = 0; i < sz_n; ++i)
+        {
+            cv::Mat tempvp = (cv::Mat_<float>(3,1) << vp[i].x, vp[i].y, vp[i].z);
+            cv::Mat tempvq = (cv::Mat_<float>(1,3) << vq[i].x, vq[i].y, vq[i].z);
+            if(mat_vp.empty())
+                mat_vp = tempvp;
+            else
+                cv::hconcat(mat_vp, tempvp, mat_vp);
+            if(mat_vq.empty())
+                mat_vq = tempvq;
+            else
+                cv::vconcat(mat_vq, tempvq, mat_vq);
+        }
 
-        // // covariance matrix
-        // cv::Mat s_mat;
-        // s_mat = mat_vp * mat_vq;
-
-        // cv::transpose(dstMat, dstTranspose);
-        // cv::Mat covMat = srcMat * dstTranspose;
-        // assert(covMat.rows == covMat.cols);
-        // assert(covMat.rows == 3);
+        // covariance matrix
+        cv::Mat s_mat;
+        s_mat = mat_vp * mat_vq;
+        assert(s_mat.rows == 3 && s_mat.cols == 3);
         //4. perform SVD.
-        // cv::Mat_<double> w, u, vt;
-        // cv::SVDecomp(covMat,w, u, vt);
-
+        cv::Mat w, u, vt, v, ut;
+        //vt is 3x3
+        //u is 3x3
+        m_svd.compute(s_mat, w, u, vt);
+        cv::transpose(vt, v);
+        cv::transpose(u, ut);
+        //4b. Setup for rotation mat and translation vector
+        cv::Mat m_E = cv::Mat::eye(3, 3, CV_32F);
+        cv::Mat m_v_ut = v * ut;
+        double detVal = cv::determinant(m_v_ut);
+        m_E.at<float>(2,2) = detVal;
+        cv::Mat rotMat;
+        rotMat = v * (m_E * ut);
+        cv::Mat trVec;
+        trVec = q_centMat - (rotMat*p_centMat);
 
         //for printouts
         m_matcherCounter++;
-        if(m_matcherCounter % 20 == 0)
+        if(m_matcherCounter % 25 == 0)
         {
             m_matcherCounter = 0;
-            // std::cout << "size of s_mat (rows,cols): " << s_mat.rows << "," << s_mat.cols << std::endl;
+            std::cout << "rotMat:\n" << rotMat << std::endl;
+            std::cout << "translation:\n" << trVec << std::endl;
+            // std::cout << "u \n" << u << std::endl;
+            // std::cout << "ut \n" << ut << std::endl;
+            // std::cout << "w \n" << w << std::endl;
+            // std::cout << "v \n" << v << std::endl;
+            // std::cout << "vt \n" << vt << std::endl;
+            
         }
         
         //5. Output R_3x3 rotation matrix and tr_3x1 translation vector

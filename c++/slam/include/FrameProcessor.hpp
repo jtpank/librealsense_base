@@ -20,6 +20,7 @@ class FrameProcessor
     private:
         cv::Ptr<cv::ORB> m_pOrb;
         cv::Ptr<cv::BFMatcher> m_bfMatcher;
+        cv::SVD m_svd;
         float m_depthScale;
         unsigned int m_poolSize;
         std::vector<std::thread> m_pool;
