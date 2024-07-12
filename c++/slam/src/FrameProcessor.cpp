@@ -376,18 +376,18 @@ void FrameProcessor::frameMatcher()
             vq.emplace_back(tempq);
         }
         // //3. find covariance matrix S
-        cv::Mat mat_vp, mat_vq;
-        for(int i = 0; i < sz_n; ++i)
-        {
-            cv::Mat tempvp = (cv::Mat_<float>(3,1) << vp[i].x, vp[i].y, vp[i].z);
-            cv::Mat tempvq = (cv::Mat_<float>(1,3) << vq[i].x, vq[i].y, vq[i].z);
-            cv::vconcat(mat_vp, tempvp, mat_vp);
-            cv::hconcat(mat_vq, tempvq, mat_vq);
-        }
+        // cv::Mat mat_vp, mat_vq;
+        // for(int i = 0; i < sz_n; ++i)
+        // {
+        //     cv::Mat tempvp = (cv::Mat_<float>(3,1) << vp[i].x, vp[i].y, vp[i].z);
+        //     cv::Mat tempvq = (cv::Mat_<float>(1,3) << vq[i].x, vq[i].y, vq[i].z);
+        //     cv::vconcat(mat_vp, tempvp, mat_vp);
+        //     cv::hconcat(mat_vq, tempvq, mat_vq);
+        // }
 
-        // covariance matrix
-        cv::Mat s_mat;
-        s_mat = mat_vp * mat_vq;
+        // // covariance matrix
+        // cv::Mat s_mat;
+        // s_mat = mat_vp * mat_vq;
 
         // cv::transpose(dstMat, dstTranspose);
         // cv::Mat covMat = srcMat * dstTranspose;
@@ -403,7 +403,7 @@ void FrameProcessor::frameMatcher()
         if(m_matcherCounter % 20 == 0)
         {
             m_matcherCounter = 0;
-            std::cout << "size of s_mat (rows,cols): " << s_mat.rows << "," << s_mat.cols << std::endl;
+            // std::cout << "size of s_mat (rows,cols): " << s_mat.rows << "," << s_mat.cols << std::endl;
         }
         
         //5. Output R_3x3 rotation matrix and tr_3x1 translation vector
