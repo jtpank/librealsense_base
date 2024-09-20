@@ -22,6 +22,17 @@ using namespace std;
 // +y is to my up
 // +z is into the camer
 
+void enableStreams(rs2::config &cfg)
+{
+    //May take too long
+    //Add desired streams to configuration
+    cfg.enable_stream(RS2_STREAM_ACCEL, RS2_FORMAT_MOTION_XYZ32F);
+    cfg.enable_stream(RS2_STREAM_GYRO,  RS2_FORMAT_MOTION_XYZ32F);
+    cfg.enable_stream(RS2_STREAM_COLOR, 640, 480, RS2_FORMAT_BGR8, 30);
+    cfg.enable_stream(RS2_STREAM_DEPTH, 640, 480, RS2_FORMAT_Z16, 30);
+
+}
+
 
 int main(int argc, char** argv)
 {
@@ -37,7 +48,7 @@ int main(int argc, char** argv)
     }
 
     unsigned int n_threads = std::thread::hardware_concurrency();
-    std::cout << n_threads << " concurrent threads supported." << std::endl;
+    std::cout << n_threads << " concurrent hardware threads supported." << std::endl;
     //Testing fp_ptr
     try {
         rs2::context ctx;
@@ -52,12 +63,7 @@ int main(int argc, char** argv)
         rs2::colorizer color_map;
         //Create a configuration for configuring the pipeline with a non default profile
         rs2::config cfg;
-        //May take too long
-        //Add desired streams to configuration
-        cfg.enable_stream(RS2_STREAM_ACCEL, RS2_FORMAT_MOTION_XYZ32F);
-        cfg.enable_stream(RS2_STREAM_GYRO,  RS2_FORMAT_MOTION_XYZ32F);
-        cfg.enable_stream(RS2_STREAM_COLOR, 640, 480, RS2_FORMAT_BGR8, 30);
-        cfg.enable_stream(RS2_STREAM_DEPTH, 640, 480, RS2_FORMAT_Z16, 30);
+        enableStreams(cfg);
 
         //Instruct pipeline to start streaming with the requested configuration
         rs2::pipeline_profile pipeline_profile = pipe.start(cfg);
