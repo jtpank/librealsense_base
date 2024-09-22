@@ -342,64 +342,92 @@ void FrameProcessor::frameMatcher()
         
 
         //1. compute the centroids
-        float3 good_srcCentroid, good_dstCentroid;
-        good_srcCentroid.x = 0.f;
-        good_srcCentroid.y = 0.f;
-        good_srcCentroid.z = 0.f;
-        good_dstCentroid.x = 0.f;
-        good_dstCentroid.y = 0.f;
-        good_dstCentroid.z = 0.f;
-        for(int i = 0; i < good_srcPoints.size(); ++i)
+        cv::Point3f p_centroid(0.0f, 0.0f, 0.0f), q_centroid(0.0f, 0.0f, 0.0f);
+        int sz_n = good_srcPoints.size();
+        for(int i = 0; i < sz_n; ++i)
         {
-            good_srcCentroid.add(good_srcPoints[i].x, good_srcPoints[i].y, good_srcPoints[i].z);
-            good_dstCentroid.add(good_dstPoints[i].x, good_dstPoints[i].y, good_dstPoints[i].z);
+            p_centroid.x += good_srcPoints[i].x;
+            p_centroid.y += good_srcPoints[i].y;
+            p_centroid.z += good_srcPoints[i].z;
+            
+            q_centroid.x += good_dstPoints[i].x;
+            q_centroid.y += good_dstPoints[i].y;
+            q_centroid.z += good_dstPoints[i].z;
         }
-        good_srcCentroid = good_srcCentroid / static_cast<float>(good_srcPoints.size());
-        good_dstCentroid = good_dstCentroid / static_cast<float>(good_dstPoints.size());
+        p_centroid.x /= static_cast<float>(sz_n);
+        p_centroid.y /= static_cast<float>(sz_n);
+        p_centroid.z /= static_cast<float>(sz_n);
 
-        //2. compute centralized vectors
-        std::vector<float3> cent_srcVector, cent_dstVector;
-        for(int i = 0; i < good_srcPoints.size(); ++i)
+        q_centroid.x /= static_cast<float>(sz_n);
+        q_centroid.y /= static_cast<float>(sz_n);
+        q_centroid.z /= static_cast<float>(sz_n);
+        cv::Mat p_centMat = (cv::Mat_<float>(3,1) << p_centroid.x, p_centroid.y, p_centroid.z);
+        cv::Mat q_centMat = (cv::Mat_<float>(3,1) << q_centroid.x, q_centroid.y, q_centroid.z);
+        std::vector<cv::Point3f> vp, vq;
+        for(int i = 0; i < sz_n; ++i)
         {
-            float3 srcCent, dstCent;
-            srcCent.x = good_srcPoints[i].x - good_srcCentroid.x;
-            srcCent.y = good_srcPoints[i].y - good_srcCentroid.y;
-            srcCent.z = good_srcPoints[i].z - good_srcCentroid.z;
-            dstCent.x = good_dstPoints[i].x - good_dstCentroid.x;
-            dstCent.y = good_dstPoints[i].y - good_dstCentroid.y;
-            dstCent.z = good_dstPoints[i].z - good_dstCentroid.z;
-            cent_srcVector.emplace_back(srcCent);
-            cent_dstVector.emplace_back(dstCent);
+            cv::Point3f tempp, tempq;
+            tempp.x = good_srcPoints[i].x - p_centroid.x;
+            tempp.y = good_srcPoints[i].y - p_centroid.y;
+            tempp.z = good_srcPoints[i].z - p_centroid.z;
+
+            tempq.x = good_dstPoints[i].x - q_centroid.x;
+            tempq.y = good_dstPoints[i].y - q_centroid.y;
+            tempq.z = good_dstPoints[i].z - q_centroid.z;
+
+            vp.emplace_back(tempp);
+            vq.emplace_back(tempq);
         }
         // //3. find covariance matrix S
-        // cv::Mat srcMat = cv::Mat::zeros(3, cent_srcVector.size(),CV_32FC1);
-        // cv::Mat dstMat = cv::Mat::zeros(3, cent_srcVector.size(),CV_32FC1);
-        // cv::Mat dstTranspose;
-        // for(int i = 0; i < cent_srcVector.size(); ++i)
-        // {
-        //     srcMat.at<double>(0, i) = cent_srcVector[i].x;
-        //     srcMat.at<double>(1, i) = cent_srcVector[i].y;
-        //     srcMat.at<double>(2, i) = cent_srcVector[i].z;
+        cv::Mat mat_vp, mat_vq;
+        for(int i = 0; i < sz_n; ++i)
+        {
+            cv::Mat tempvp = (cv::Mat_<float>(3,1) << vp[i].x, vp[i].y, vp[i].z);
+            cv::Mat tempvq = (cv::Mat_<float>(1,3) << vq[i].x, vq[i].y, vq[i].z);
+            if(mat_vp.empty())
+                mat_vp = tempvp;
+            else
+                cv::hconcat(mat_vp, tempvp, mat_vp);
+            if(mat_vq.empty())
+                mat_vq = tempvq;
+            else
+                cv::vconcat(mat_vq, tempvq, mat_vq);
+        }
 
-        //     dstMat.at<double>(0, i) = cent_dstVector[i].x;
-        //     dstMat.at<double>(1, i) = cent_dstVector[i].y;
-        //     dstMat.at<double>(2, i) = cent_dstVector[i].z;
-        // }
-        // cv::transpose(dstMat, dstTranspose);
-        // cv::Mat covMat = srcMat * dstTranspose;
-        // assert(covMat.rows == covMat.cols);
-        // assert(covMat.rows == 3);
+        // covariance matrix
+        cv::Mat s_mat;
+        s_mat = mat_vp * mat_vq;
+        assert(s_mat.rows == 3 && s_mat.cols == 3);
         //4. perform SVD.
-        // cv::Mat_<double> w, u, vt;
-        // cv::SVDecomp(covMat,w, u, vt);
+        cv::Mat w, u, vt, v, ut;
+        //vt is 3x3
+        //u is 3x3
+        m_svd.compute(s_mat, w, u, vt);
+        cv::transpose(vt, v);
+        cv::transpose(u, ut);
+        //4b. Setup for rotation mat and translation vector
+        cv::Mat m_E = cv::Mat::eye(3, 3, CV_32F);
+        cv::Mat m_v_ut = v * ut;
+        double detVal = cv::determinant(m_v_ut);
+        m_E.at<float>(2,2) = detVal;
+        cv::Mat rotMat;
+        rotMat = v * (m_E * ut);
+        cv::Mat trVec;
+        trVec = q_centMat - (rotMat*p_centMat);
+
+        //for printouts
         m_matcherCounter++;
-        if(m_matcherCounter % 20 == 0)
+        if(m_matcherCounter % 25 == 0)
         {
             m_matcherCounter = 0;
-            std::cout << "size: " << good_srcPoints.size() << std::endl;
-            std::cout << "good_srcCentroid: x,y,z: " << good_srcCentroid.x << "," << good_srcCentroid.y << "," << good_srcCentroid.z << std::endl;
-            std::cout << "good_dstCentroid: x,y,z: " << good_dstCentroid.x << "," << good_dstCentroid.y << "," << good_dstCentroid.z << std::endl;  
-            // std::cout << "CovMat: \n" << covMat << std::endl;
+            std::cout << "rotMat:\n" << rotMat << std::endl;
+            std::cout << "translation:\n" << trVec << std::endl;
+            // std::cout << "u \n" << u << std::endl;
+            // std::cout << "ut \n" << ut << std::endl;
+            // std::cout << "w \n" << w << std::endl;
+            // std::cout << "v \n" << v << std::endl;
+            // std::cout << "vt \n" << vt << std::endl;
+            
         }
         
         //5. Output R_3x3 rotation matrix and tr_3x1 translation vector
