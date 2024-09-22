@@ -10,7 +10,7 @@ m_hasFirstFrame(false),  m_shutdownThreads(false)
     m_poolSize = poolSize;
 
     try {
-        //Push back 3 threads for each frame
+        //Push back 3 threads, 1 for each frame
         m_pool.emplace_back(std::thread( [=]() { frameConsumer(0, colorFrameType); }));
         m_pool.emplace_back(std::thread( [=]() { frameConsumer(1, depthFrameType); }));
         m_pool.emplace_back(std::thread( [=]() { frameConsumer(2, imuFrameType); }));
@@ -281,7 +281,7 @@ void FrameProcessor::orbDetectAndCompute(cv::Mat &inputFrame, cv::Mat &outputFra
 }
 
 
-//TODO: dont make these points and pc pass in. They are member variables!
+//TODO: dont pass in these points and pc They are member variables!
 void FrameProcessor::grabVertices(rs2::depth_frame &depth_frame, rs2::points &points, rs2::pointcloud &pc)
 {
     points = pc.calculate(depth_frame);
@@ -337,6 +337,8 @@ void FrameProcessor::frameMatcher()
         m_vertices.pop_front();
         assert(good_srcPoints.size() == good_dstPoints.size());
         assert(good_matches.size() == good_srcPoints.size());
+        //We now have physical XYZ points from pointcloud, in the src and dst frames, that are the pixel coordinates of the
+        // good matches found using the brute force knn match algorithm
         
 
         //1. compute the centroids
