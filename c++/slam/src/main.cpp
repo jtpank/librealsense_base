@@ -68,6 +68,16 @@ int main(int argc, char** argv)
         //Instruct pipeline to start streaming with the requested configuration
         rs2::pipeline_profile pipeline_profile = pipe.start(cfg);
         
+        auto sensors = pipeline_profile.get_device().query_sensors();
+for (auto&& sensor : sensors)
+{
+    for (auto&& stream_profile : sensor.get_stream_profiles())
+    {
+        std::cout << "Stream: " << stream_profile.stream_name()
+                  << ", Format: " << rs2_format_to_string(stream_profile.format())
+                  << ", FPS: " << stream_profile.fps() << std::endl;
+    }
+}
         //Very important for aligning frames
         rs2::align align(RS2_STREAM_COLOR);
         rs2::pointcloud pc;
@@ -117,6 +127,8 @@ int main(int argc, char** argv)
                 if (gyro)
                 {
                     rs2_vector gv = gyro.get_motion_data();
+                    // std::cout << "Gyro: x=" << gv.x << ", y=" << gv.y << ", z=" << gv.z << std::endl;
+
                     algo.process_gyro(gv, gyro_ts);
                 }
                 if (accel)
@@ -125,7 +137,7 @@ int main(int argc, char** argv)
                     algo.process_accel(av);
                 }
                 float3 outputTheta = (algo.get_theta())* 180.0 / M_PI;
-                // std::cout << "Pitch: " << outputTheta.x << " Yaw: " << outputTheta.y << " Roll: " << outputTheta.z << std::endl;
+                std::cout << "Pitch: " << outputTheta.x << " Yaw: " << outputTheta.y << " Roll: " << outputTheta.z << std::endl;
 
                 rs2::frame color_frame = aligned_frames.get_color_frame();
                 rs2::depth_frame aligned_depth_frame = aligned_frames.get_depth_frame();
@@ -133,16 +145,17 @@ int main(int argc, char** argv)
                 cv::Mat depth_image(cv::Size(640, 480), CV_16UC1, (void*)aligned_depth_frame.get_data(), cv::Mat::AUTO_STEP);
                 cv::Mat output_frame;
                 fp_ptr->orbDetectAndCompute(color_image, output_frame);
+                // fp_ptr->wrapGoodFeatures(color_image, output_frame);
                 fp_ptr->grabVertices(aligned_depth_frame, points, pc);
                 // // TODO: maybe put the if frames > 0 here?
-                fp_ptr->frameMatcher();
+                // fp_ptr->frameMatcher();
                 
 
 
                 //grab the xyz point set found from framematcher
                 // run the algorithm in https://arxiv.org/pdf/2203.15119
                 // and then we use the translation vector and rotation matrix as our odometry
-                cv::imshow(windowName, color_image);
+                cv::imshow(windowName, output_frame);
             }
 
             std::chrono::duration<double, std::milli> duration = end - start;

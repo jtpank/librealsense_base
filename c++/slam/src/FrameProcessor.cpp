@@ -420,8 +420,8 @@ void FrameProcessor::frameMatcher()
         if(m_matcherCounter % 25 == 0)
         {
             m_matcherCounter = 0;
-            std::cout << "rotMat:\n" << rotMat << std::endl;
-            std::cout << "translation:\n" << trVec << std::endl;
+            //std::cout << "rotMat:\n" << rotMat << std::endl;
+            //std::cout << "translation:\n" << trVec << std::endl;
             // std::cout << "u \n" << u << std::endl;
             // std::cout << "ut \n" << ut << std::endl;
             // std::cout << "w \n" << w << std::endl;

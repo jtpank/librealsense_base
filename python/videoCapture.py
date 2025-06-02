@@ -30,5 +30,3 @@ if __name__ == "__main__":
     outputWriter.release()
     cv2.destroyAllWindows()
     pipeline.stop()
-        
-    print("hi")
