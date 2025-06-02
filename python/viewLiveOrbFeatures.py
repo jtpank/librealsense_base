@@ -90,6 +90,8 @@ if __name__ == "__main__":
     mask = np.zeros((HEIGHT, WIDTH, 3), dtype=np.uint8)
     p0 = None
     MIN_TRACKED_POINTS = 20  # NEW: threshold for refreshing features
+    FRAME_REFRESH_INTERVAL = 10  # every 10 frames
+    frame_count = 0
     while True:
         frames = pipeline.wait_for_frames()
         aligned_frames = align.process(frames)
@@ -111,10 +113,11 @@ if __name__ == "__main__":
 
         # goodFeatures = cv2.goodFeaturesToTrack(np.mean(color_image, axis=2).astype(np.uint8),mask = None, **feature_params)
         
-        if p0 is None or len(p0) < MIN_TRACKED_POINTS:
+        frame_count += 1
+        if frame_count % FRAME_REFRESH_INTERVAL == 0 or p0 is None or len(p0) < MIN_TRACKED_POINTS:
             p0 = cv2.goodFeaturesToTrack(curr_gray_image, mask=None, **feature_params)
+            mask = np.zeros((HEIGHT, WIDTH, 3), dtype=np.uint8)
             prev_gray_image = curr_gray_image.copy()
-            mask = np.zeros((HEIGHT, WIDTH, 3), dtype=np.uint8)  # NEW: reset mask to clear old lines
             continue
 
         # calculate optical flow
